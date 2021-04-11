@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SistemaBlueddit.Client", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SistemaBlueddit.Server", "SistemaBlueddit.Server\SistemaBlueddit.Server.csproj", "{BBEFA009-2C1D-4922-95B2-7989B99879CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaBlueddit.Domain", "SistemaBlueddit.Domain\SistemaBlueddit.Domain.csproj", "{9745B265-2174-4D30-AEB3-BF36AFCE380E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SistemaBlueddit.Domain", "SistemaBlueddit.Domain\SistemaBlueddit.Domain.csproj", "{9745B265-2174-4D30-AEB3-BF36AFCE380E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaBlueddit.Server.Logic", "SistemaBlueddit.Server.Logic\SistemaBlueddit.Server.Logic.csproj", "{ADB26C69-9FD7-4214-9A95-3A11E0356159}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SistemaBlueddit.Server.Logic", "SistemaBlueddit.Server.Logic\SistemaBlueddit.Server.Logic.csproj", "{ADB26C69-9FD7-4214-9A95-3A11E0356159}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaBlueddit.ProtocolLibrary", "SistemaBlueddit.Protocol.Library\SistemaBlueddit.ProtocolLibrary.csproj", "{39E5B96D-7A75-46E7-A1C2-9D4CC885FA5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SistemaBlueddit.ProtocolLibrary", "SistemaBlueddit.Protocol.Library\SistemaBlueddit.ProtocolLibrary.csproj", "{39E5B96D-7A75-46E7-A1C2-9D4CC885FA5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaBlueddit.Client.Logic", "SistemaBlueddit.Client.Logic\SistemaBlueddit.Client.Logic.csproj", "{207F7534-4AFB-491C-A729-899BACAD3A8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,18 @@ Global
 		{39E5B96D-7A75-46E7-A1C2-9D4CC885FA5A}.Release|x64.Build.0 = Release|Any CPU
 		{39E5B96D-7A75-46E7-A1C2-9D4CC885FA5A}.Release|x86.ActiveCfg = Release|Any CPU
 		{39E5B96D-7A75-46E7-A1C2-9D4CC885FA5A}.Release|x86.Build.0 = Release|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Debug|x64.Build.0 = Debug|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Debug|x86.Build.0 = Debug|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Release|x64.ActiveCfg = Release|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Release|x64.Build.0 = Release|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Release|x86.ActiveCfg = Release|Any CPU
+		{207F7534-4AFB-491C-A729-899BACAD3A8F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
