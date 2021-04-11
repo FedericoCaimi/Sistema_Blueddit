@@ -5,4 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaBlueddit.Client.Logic\SistemaBlueddit.Client.Logic.csproj" />
+    <ProjectReference Include="..\SistemaBlueddit.Protocol.Library\SistemaBlueddit.Protocol.Library.csproj" />
+  </ItemGroup>
+
 </Project>
