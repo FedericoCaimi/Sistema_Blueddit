@@ -25,7 +25,7 @@ namespace SistemaBlueddit.Client.Logic
 
         public byte[] ConvertDataToHeader(short command, int data)
         {
-            return _headerHandler.EncodeHeader(command, data);
+            return _headerHandler.EncodeHeader(command, HeaderConstants.Request, data);
         }
     }
 }
