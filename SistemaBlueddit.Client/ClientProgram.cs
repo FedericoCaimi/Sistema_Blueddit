@@ -15,13 +15,13 @@ namespace SistemaBlueddit.Client
             var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0));
             tcpClient.Connect(IPAddress.Parse("127.0.0.1"), 50000);
 
-            Console.WriteLine("Bienvenido al Sistema Blueddit");
-            Console.WriteLine("uno - envia comando uno");
-            Console.WriteLine("dos - salir");
             try
             {
                 while (!exit)
                 {
+                    Console.WriteLine("Bienvenido al Sistema Blueddit");
+                    Console.WriteLine("uno - envia comando uno");
+                    Console.WriteLine("dos - salir");
                     var option = Console.ReadLine();
                     switch (option)
                     {
