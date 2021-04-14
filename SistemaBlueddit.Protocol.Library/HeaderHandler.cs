@@ -1,50 +1,44 @@
-﻿using System;
-using System.Text;
+﻿using SistemaBlueddit.Domain;
+using System;
+using System.Net.Sockets;
 
 namespace SistemaBlueddit.Protocol.Library
 {
-
-        /// XXXX YYYY
-        /// XXXX-> Largo del nombre del archivo, YYYY -> Largo del file
-        /// ZZZZZZZZZZZ... -> Nombre del archivo
-        /// N Segmentos (YYYY / MaxPacketSize) -> Cada Segmento mide MaxPacketSize o menos
-        ///
-        /// Crear nuevo post
-        /// REQ05XXXX <Titulo de Post>#<Contenido del post>
-        ///
-        /// Listar ususarios conectados
-        /// REQ010000
-        ///  
-
-        /// REQ05XXXXYYYY
-    public class HeaderHandler
+    public static class HeaderHandler
     {
-        /*public byte[] EncodeHeader(short command, char[] headerMethod, int dataLength)
+        public static byte[] EncodeHeader(string headerMethod, short command, int dataLength, int fileNameLength)
         {
-            var header = new byte[HeaderConstants.CommandLength + HeaderConstants.MethodLength + HeaderConstants.DataLength];
-            Array.Copy(BitConverter.GetBytes(command), 0, header, 0, HeaderConstants.CommandLength);
-            Array.Copy(Encoding.UTF8.GetBytes(headerMethod), 0, header, HeaderConstants.CommandLength, HeaderConstants.MethodLength);
-            Array.Copy(BitConverter.GetBytes(dataLength), 0, header, HeaderConstants.CommandLength + HeaderConstants.MethodLength, HeaderConstants.DataLength);
-            return header;
-        }*/
-        public byte[] EncodeHeader(short command, string headerMethod, int dataLength, int fileNameLength)
-        {
-            byte[] method = System.Text.Encoding.UTF8.GetBytes(headerMethod);
-            var header = new byte[HeaderConstants.CommandLength + HeaderConstants.MethodLength + HeaderConstants.DataLength];
-            Array.Copy(BitConverter.GetBytes(command), 0, header, 0, HeaderConstants.CommandLength);
-            Array.Copy(method, 0, header, HeaderConstants.CommandLength, HeaderConstants.MethodLength);
-            Array.Copy(BitConverter.GetBytes(dataLength), 0, header, HeaderConstants.CommandLength + HeaderConstants.MethodLength, HeaderConstants.DataLength);
-            Array.Copy(BitConverter.GetBytes(fileNameLength), 0, header, HeaderConstants.CommandLength + HeaderConstants.MethodLength+HeaderConstants.DataLength, HeaderConstants.FileNameLength);
+            var method = System.Text.Encoding.UTF8.GetBytes(headerMethod);
+            var header = new byte[HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength];
+            Array.Copy(method, 0, header, 0, HeaderConstants.MethodLength);
+            Array.Copy(BitConverter.GetBytes(command), 0, header, HeaderConstants.MethodLength, HeaderConstants.CommandLength);
+            Array.Copy(BitConverter.GetBytes(dataLength), 0, header, HeaderConstants.MethodLength + HeaderConstants.CommandLength, HeaderConstants.DataLength);
+            Array.Copy(BitConverter.GetBytes(fileNameLength), 0, header, HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength, HeaderConstants.FileNameLength);
             return header;
         }
 
-        public Header DecodeHeader(byte[] data)
+        public static Header DecodeHeader(NetworkStream stream)
         {
             try
             {
-                short command = BitConverter.ToInt16(data, 0);
-                int dataLength = BitConverter.ToInt32(data, HeaderConstants.CommandLength);
-                return new Tuple<short, int>(command, dataLength);
+                var headerSize = HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength;
+                var data = new byte[headerSize];
+                stream.Read(data, 0, headerSize);
+                var headerMethodBytes = new byte[HeaderConstants.MethodLength];
+                Array.Copy(data, 0, headerMethodBytes, 0, HeaderConstants.MethodLength);
+                var headerMethod = System.Text.Encoding.Default.GetString(headerMethodBytes);
+                var command = BitConverter.ToInt16(data, HeaderConstants.MethodLength);                
+                var dataLength = BitConverter.ToInt32(data, HeaderConstants.MethodLength + HeaderConstants.CommandLength);
+                var fileNameLength = BitConverter.ToInt32(data, HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength);
+                var header = new Header
+                {
+                    Command = command,
+                    DataLength = dataLength,
+                    FileNameLength = fileNameLength,
+                    HeaderMethod = headerMethod
+                };
+                ValidateHeader(header);
+                return header;
 
             }
             catch (Exception e)
@@ -52,6 +46,11 @@ namespace SistemaBlueddit.Protocol.Library
                 Console.WriteLine("Error decoding data: " + e.Message);
                 return null;
             }
+        }
+
+        private static void ValidateHeader(Header header)
+        {
+
         }
     }
 }
