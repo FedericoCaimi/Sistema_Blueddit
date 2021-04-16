@@ -1,6 +1,4 @@
 ﻿using SistemaBlueddit.Protocol.Library;
-using System;
-using System.Net.Sockets;
 
 namespace SistemaBlueddit.Client.Logic
 {

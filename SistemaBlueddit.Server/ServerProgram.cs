@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Server.Logic;
+using System.Text;
 
 namespace SistemaBlueddit.Server
 {
@@ -105,6 +106,11 @@ namespace SistemaBlueddit.Server
             Console.WriteLine("Header command: " + header.Command);
             Console.WriteLine("Header data length: " + header.DataLength);
             Console.WriteLine("Header file name length: " + header.FileNameLength);
+
+            var data = new byte[header.DataLength];
+            var received = networkStream.Read(data, 0, header.DataLength);
+            var gender = Encoding.UTF8.GetString(data);
+            Console.WriteLine("Gender: " + gender);
         }
 
     }
