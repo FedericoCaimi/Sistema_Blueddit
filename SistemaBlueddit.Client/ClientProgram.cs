@@ -20,16 +20,16 @@ namespace SistemaBlueddit.Client
                 while (!exit)
                 {
                     Console.WriteLine("Bienvenido al Sistema Blueddit");
-                    Console.WriteLine("uno - envia comando uno");
-                    Console.WriteLine("dos - salir");
+                    Console.WriteLine("1 - envia ");
+                    Console.WriteLine("99 - salir");
                     var option = Console.ReadLine();
                     switch (option)
                     {
-                        case "uno":
+                        case "1":
                             Console.WriteLine("Conectado al server y voy a enviar el header");
                             SendHeader(tcpClient);
                             break;
-                        case "dos":
+                        case "99":
                             exit = true;
                             tcpClient.GetStream().Close();
                             tcpClient.Close();
@@ -48,7 +48,7 @@ namespace SistemaBlueddit.Client
 
         public static void SendHeader(TcpClient connectedClient)
         {
-            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, 02, 5, 5);
+            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, 1, 5, 5);
             var connectionStream = connectedClient.GetStream();
             connectionStream.Write(header);
         }

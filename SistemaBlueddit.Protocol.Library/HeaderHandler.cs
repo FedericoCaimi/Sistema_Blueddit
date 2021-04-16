@@ -1,5 +1,6 @@
 ﻿using SistemaBlueddit.Domain;
 using System;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace SistemaBlueddit.Protocol.Library
@@ -23,7 +24,13 @@ namespace SistemaBlueddit.Protocol.Library
             {
                 var headerSize = HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength;
                 var data = new byte[headerSize];
+                Console.WriteLine("Estoy en el read");
                 stream.Read(data, 0, headerSize);
+                var hasAllZeroes = data.All(singleByte => singleByte == 0);
+                if(hasAllZeroes)
+                {   
+                    throw new Exception("El header vino vacio se cierra la conexion");
+                }
                 var headerMethodBytes = new byte[HeaderConstants.MethodLength];
                 Array.Copy(data, 0, headerMethodBytes, 0, HeaderConstants.MethodLength);
                 var headerMethod = System.Text.Encoding.Default.GetString(headerMethodBytes);
@@ -44,7 +51,7 @@ namespace SistemaBlueddit.Protocol.Library
             catch (Exception e)
             {
                 Console.WriteLine("Error decoding data: " + e.Message);
-                return null;
+                throw e;
             }
         }
 

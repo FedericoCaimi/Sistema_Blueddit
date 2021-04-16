@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SistemaBlueddit.Protocol.Library\SistemaBlueddit.Protocol.Library.csproj" />
+    <ProjectReference Include="..\SistemaBlueddit.Server.Logic\SistemaBlueddit.Server.Logic.csproj" />
   </ItemGroup>
 
 </Project>
