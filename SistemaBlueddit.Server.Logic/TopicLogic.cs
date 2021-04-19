@@ -36,5 +36,16 @@ namespace SistemaBlueddit.Server.Logic
                 Console.WriteLine(topic.PrintTopic());
             }
         }
+
+        public void ValidateTopics(List<Topic> topics)
+        {
+            topics.ForEach((topic) =>
+            {
+                if(!_topics.Exists(t => t.Name == topic.Name))
+                {
+                    throw new Exception("Tema no existe");
+                }
+            });
+        }
     }
 }

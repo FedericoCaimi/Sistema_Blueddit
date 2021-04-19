@@ -3,7 +3,7 @@ using SistemaBlueddit.Protocol.Library;
 using System;
 using System.Net.Sockets;
 
-namespace SistemaBlueddit.Logic.Library
+namespace SistemaBlueddit.Client.Logic
 {
     public class TopicLogic
     {
@@ -21,7 +21,7 @@ namespace SistemaBlueddit.Logic.Library
             DataHandler.SendData(connectedClient, topicSerialized);
         }
 
-        private Topic CreateTopic()
+        public Topic CreateTopic()
         {
             Console.WriteLine("Nombre del tema:");
             var name = Console.ReadLine();

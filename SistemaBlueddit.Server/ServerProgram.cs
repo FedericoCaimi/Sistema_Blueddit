@@ -14,6 +14,7 @@ namespace SistemaBlueddit.Server
         private static bool _exit = false;
         public static UserLogic userLogic = new UserLogic();
         public static TopicLogic topicLogic = new TopicLogic();
+        public static PostLogic postLogic = new PostLogic();
 
         static void Main(string[] args)
         {
@@ -96,6 +97,12 @@ namespace SistemaBlueddit.Server
                     {
                         case 01:
                             var topic = topicLogic.RecieveTopic(header, networkStream);
+                            Console.WriteLine("Topic: " + topic.Name + " " + topic.Description);
+                            topicLogic.AddTopic(topic);
+                            break;
+                        case 02:
+                            var post = postLogic.RecievePost(header, networkStream);
+                            topicLogic.ValidateTopics(post.Topics);
                             Console.WriteLine("Topic: " + topic.Name + " " + topic.Description);
                             topicLogic.AddTopic(topic);
                             break;
