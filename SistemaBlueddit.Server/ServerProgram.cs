@@ -97,14 +97,18 @@ namespace SistemaBlueddit.Server
                     {
                         case 01:
                             var topic = topicLogic.RecieveTopic(header, networkStream);
-                            Console.WriteLine("Topic: " + topic.Name + " " + topic.Description);
+                            Console.WriteLine(topic.PrintTopic());
                             topicLogic.AddTopic(topic);
                             break;
                         case 02:
                             var post = postLogic.RecievePost(header, networkStream);
                             topicLogic.ValidateTopics(post.Topics);
-                            Console.WriteLine("Topic: " + topic.Name + " " + topic.Description);
-                            topicLogic.AddTopic(topic);
+                            Console.WriteLine("Nombre de la publicacion: " + post.Name);
+                            foreach (var postTopic in post.Topics)
+                            {
+                                Console.WriteLine(postTopic.PrintTopic());
+                            }
+                            postLogic.AddPost(post);
                             break;
                         default:
                             Console.WriteLine("Opcion invalida...");
@@ -115,7 +119,7 @@ namespace SistemaBlueddit.Server
             }
             catch (Exception e)
             {
-                Console.WriteLine("Removing client. " + e.Message);
+                Console.WriteLine("Borrando el cliente. " + e.Message);
                 userLogic.RemoveUser(user);
             }
             Console.WriteLine("El cliente con hora de conexion "+ user.StartConnection.ToString()+" se desconecto");
