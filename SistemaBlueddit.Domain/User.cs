@@ -25,7 +25,7 @@ namespace SistemaBlueddit.Domain
         {
             var userAddress = ((IPEndPoint)(TcpClient.Client.RemoteEndPoint)).Address.ToString();
             var userPort = ((IPEndPoint)(TcpClient.Client.RemoteEndPoint)).Port.ToString();
-            return "User IP: "+ userAddress + ":" + userPort + " Hora de conexion: " +StartConnection.ToString();
+            return "User IP: "+ userAddress + ":" + userPort + "\nHora de conexion: " +StartConnection.ToString();
         }
     }
 }

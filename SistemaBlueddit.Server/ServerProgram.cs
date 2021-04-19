@@ -28,12 +28,16 @@ namespace SistemaBlueddit.Server
             {
                 Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
                 Console.WriteLine("1 - Listar clientes conectados");
+                Console.WriteLine("2 - Listar todos los temas del sistema");
                 Console.WriteLine("99 - salir");
                 var option = Console.ReadLine();
                 switch (option)
                 {
                     case "1":
                         userLogic.ShowUsers();
+                        break;
+                    case "2":
+                        topicLogic.ShowTopics();
                         break;
                     case "99":
                         _exit = true;

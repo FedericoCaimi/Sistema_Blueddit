@@ -9,6 +9,11 @@ namespace SistemaBlueddit.Domain
         public string Name { get; set; }
         public string Description { get; set; }
 
+        public string PrintTopic()
+        {
+            return $"Nombre Tema: {Name}\nDescripcion del Tema: {Description}";
+        }
+
         public string SerializeObejct()
         {
             return $"{{name:{Name},description:{Description}}}";
@@ -31,7 +36,7 @@ namespace SistemaBlueddit.Domain
                         Description = propertyValue;
                         break;
                     default:
-                        throw new Exception("Object Type is not Topic");
+                        throw new Exception("Objeto no es del tipo tema");
                 }
             }
             return this;

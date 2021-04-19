@@ -15,6 +15,7 @@ namespace SistemaBlueddit.Client
             Console.WriteLine("Cliente se esta iniciando");
             var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0));
             tcpClient.Connect(IPAddress.Parse("127.0.0.1"), 50000);
+            Console.WriteLine("Cliente se conectó al servidor.");
 
             try
             {

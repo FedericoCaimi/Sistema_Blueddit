@@ -1,4 +1,5 @@
 ﻿using SistemaBlueddit.Domain;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -26,6 +27,14 @@ namespace SistemaBlueddit.Server.Logic
         public void AddTopic(Topic topic)
         {
             _topics.Add(topic);
+        }
+
+        public void ShowTopics()
+        {
+            foreach (var topic in _topics)
+            {
+                Console.WriteLine(topic.PrintTopic());
+            }
         }
     }
 }
