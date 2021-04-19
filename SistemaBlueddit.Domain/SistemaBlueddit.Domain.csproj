@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaBlueddit.Domain.Interface\SistemaBlueddit.Domain.Interface.csproj" />
+  </ItemGroup>
+
 </Project>

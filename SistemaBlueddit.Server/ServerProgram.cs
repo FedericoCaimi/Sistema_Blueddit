@@ -11,12 +11,12 @@ namespace SistemaBlueddit.Server
 {
     public class ServerProgram
     {
-        public static bool _exit = false;
-        public static ClientLogic clientLogic = new ClientLogic();
+        private static bool _exit = false;
+        public static UserLogic userLogic = new UserLogic();
+        public static TopicLogic topicLogic = new TopicLogic();
+
         static void Main(string[] args)
         {
-            //ClientLogic clientLogic = new ClientLogic();
-            var exit = false;
             Console.WriteLine("Server esta iniciando...");
             var tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 50000);
             tcpListener.Start(10);
@@ -24,7 +24,7 @@ namespace SistemaBlueddit.Server
             var threadServer = new Thread(()=> ListenForConnections(tcpListener));
             threadServer.Start();
 
-            while (!exit)
+            while (!_exit)
             {
                 Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
                 Console.WriteLine("1 - Listar clientes conectados");
@@ -33,10 +33,12 @@ namespace SistemaBlueddit.Server
                 switch (option)
                 {
                     case "1":
-                        clientLogic.ShowClients();
+                        userLogic.ShowUsers();
                         break;
                     case "99":
-                        exit = true;
+                        _exit = true;
+                        tcpListener.Stop();
+                        userLogic.CloseAll();
                         break;
                     default:
                         Console.WriteLine("Opcion invalida...");
@@ -53,14 +55,14 @@ namespace SistemaBlueddit.Server
                 try
                 {
                     var acceptedClient = tcpListener.AcceptTcpClient();
-                    var client = new Client
+                    var user = new User
                     {
                         StartConnection = DateTime.Now,
                         TcpClient = acceptedClient
                     };
-                    clientLogic.AddClient(client);
+                    userLogic.AddUser(user);
                     Console.WriteLine("Acepte una nueva conexion");
-                    var threadClient = new Thread(() => HandleClient(client));
+                    var threadClient = new Thread(() => HandleClient(user));
                     threadClient.Start();
 
                 }
@@ -77,41 +79,35 @@ namespace SistemaBlueddit.Server
             Console.WriteLine("Saliendo del listen...");
         }
 
-        private static void HandleClient(Client client)
+        private static void HandleClient(User user)
         {
-            TcpClient acceptedClient = client.TcpClient;
+            var acceptedClient = user.TcpClient;
             try
             {
                 while (!_exit)
                 {
-                    RecieveHeader(acceptedClient);
-                    
+                    var networkStream = acceptedClient.GetStream();
+                    var header = HeaderHandler.DecodeHeader(networkStream);
+                    switch (header.Command)
+                    {
+                        case 01:
+                            var topic = topicLogic.RecieveTopic(header, networkStream);
+                            Console.WriteLine("Topic: " + topic.Name + " " + topic.Description);
+                            topicLogic.AddTopic(topic);
+                            break;
+                        default:
+                            Console.WriteLine("Opcion invalida...");
+                            break;
+                    }
                 }
                 Console.WriteLine("Sali del while...");
             }
             catch (Exception e)
             {
-                Console.WriteLine("Removing client....");
-                clientLogic.RemoveClient(client);
+                Console.WriteLine("Removing client. " + e.Message);
+                userLogic.RemoveUser(user);
             }
-            Console.WriteLine("El cliente con hora de conexion "+client.StartConnection.ToString()+" se desconecto");
+            Console.WriteLine("El cliente con hora de conexion "+ user.StartConnection.ToString()+" se desconecto");
         }
-
-        public static void RecieveHeader(TcpClient connectedClient)
-        {
-            var networkStream = connectedClient.GetStream();
-            var header = HeaderHandler.DecodeHeader(networkStream);
-            Console.WriteLine("Header recibido con exito!");
-            Console.WriteLine("Header method: " + header.HeaderMethod);
-            Console.WriteLine("Header command: " + header.Command);
-            Console.WriteLine("Header data length: " + header.DataLength);
-            Console.WriteLine("Header file name length: " + header.FileNameLength);
-
-            var data = new byte[header.DataLength];
-            var received = networkStream.Read(data, 0, header.DataLength);
-            var gender = Encoding.UTF8.GetString(data);
-            Console.WriteLine("Gender: " + gender);
-        }
-
     }
 }

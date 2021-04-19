@@ -1,5 +1,4 @@
-﻿using SistemaBlueddit.Client.Logic;
-using SistemaBlueddit.Protocol.Library;
+﻿using SistemaBlueddit.Logic.Library;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -10,7 +9,7 @@ namespace SistemaBlueddit.Client
     {
         static void Main(string[] args)
         {
-            GenderLogic genderLogic = new GenderLogic();
+            var topicLogic = new TopicLogic();
             var exit = false;
 
             Console.WriteLine("Cliente se esta iniciando");
@@ -22,14 +21,13 @@ namespace SistemaBlueddit.Client
                 while (!exit)
                 {
                     Console.WriteLine("Bienvenido al Sistema Blueddit");
-                    Console.WriteLine("1 - Crear un nuevo genero");
+                    Console.WriteLine("1 - Crear un nuevo tema");
                     Console.WriteLine("99 - salir");
                     var option = Console.ReadLine();
                     switch (option)
                     {
                         case "1":
-                            //SendHeader(tcpClient);
-                            genderLogic.AddGender(tcpClient, option);
+                            topicLogic.SendTopic(tcpClient, option);
                             break;
                         case "99":
                             exit = true;
@@ -42,9 +40,9 @@ namespace SistemaBlueddit.Client
                     }
                 }
             }
-            catch (SocketException e)
+            catch (Exception)
             {
-                Console.WriteLine("Se perdió la conexión con el servidor: " + e.Message);
+                Console.WriteLine("Se perdió la conexión con el servidor.");
             }
         }
     }

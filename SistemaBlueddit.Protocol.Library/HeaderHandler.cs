@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 
 namespace SistemaBlueddit.Protocol.Library
 {
@@ -9,7 +10,7 @@ namespace SistemaBlueddit.Protocol.Library
     {
         public static byte[] EncodeHeader(string headerMethod, short command, int dataLength, int fileNameLength)
         {
-            var method = System.Text.Encoding.UTF8.GetBytes(headerMethod);
+            var method = Encoding.UTF8.GetBytes(headerMethod);
             var header = new byte[HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength];
             Array.Copy(method, 0, header, 0, HeaderConstants.MethodLength);
             Array.Copy(BitConverter.GetBytes(command), 0, header, HeaderConstants.MethodLength, HeaderConstants.CommandLength);
@@ -24,7 +25,6 @@ namespace SistemaBlueddit.Protocol.Library
             {
                 var headerSize = HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength;
                 var data = new byte[headerSize];
-                Console.WriteLine("Estoy en el read");
                 stream.Read(data, 0, headerSize);
                 var hasAllZeroes = data.All(singleByte => singleByte == 0);
                 if(hasAllZeroes)
@@ -33,7 +33,7 @@ namespace SistemaBlueddit.Protocol.Library
                 }
                 var headerMethodBytes = new byte[HeaderConstants.MethodLength];
                 Array.Copy(data, 0, headerMethodBytes, 0, HeaderConstants.MethodLength);
-                var headerMethod = System.Text.Encoding.Default.GetString(headerMethodBytes);
+                var headerMethod = Encoding.Default.GetString(headerMethodBytes);
                 var command = BitConverter.ToInt16(data, HeaderConstants.MethodLength);                
                 var dataLength = BitConverter.ToInt32(data, HeaderConstants.MethodLength + HeaderConstants.CommandLength);
                 var fileNameLength = BitConverter.ToInt32(data, HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength);
@@ -50,8 +50,7 @@ namespace SistemaBlueddit.Protocol.Library
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error decoding data: " + e.Message);
-                throw e;
+                throw new Exception("Error decodificando datos");
             }
         }
 

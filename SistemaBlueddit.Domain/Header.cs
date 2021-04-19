@@ -8,6 +8,5 @@ namespace SistemaBlueddit.Domain
         public int DataLength { get; set; }
         public string HeaderMethod { get; set; }
         public int FileNameLength { get; set; }
-
     }
 }
