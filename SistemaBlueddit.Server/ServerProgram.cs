@@ -30,7 +30,10 @@ namespace SistemaBlueddit.Server
                 Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
                 Console.WriteLine("1 - Listar clientes conectados");
                 Console.WriteLine("2 - Listar todos los temas del sistema");
-                Console.WriteLine("3 - Listar posts por orden de creado, por tema o por ambos");
+                Console.WriteLine("3 - Listar posts por tema");
+                Console.WriteLine("4 - Listar posts por orden de creado");
+                Console.WriteLine("5 - Listar posts por orden de creado y tema");
+                Console.WriteLine("6 - Listar posts por tema y orden de creado");
                 Console.WriteLine("99 - salir");
                 var option = Console.ReadLine();
                 switch (option)
@@ -42,7 +45,16 @@ namespace SistemaBlueddit.Server
                         topicLogic.ShowTopics();
                         break;
                     case "3":
-                        postLogic.ShowPosts();
+                        postLogic.ShowPostsByTopic();
+                        break;
+                    case "4":
+                        postLogic.ShowPostsByDate();
+                        break;
+                    case "5":
+                        postLogic.ShowPostsByDateAndTopic();
+                        break;
+                    case "6":
+                        postLogic.ShowPostsByTopicAndDate();
                         break;
                     case "99":
                         _exit = true;
