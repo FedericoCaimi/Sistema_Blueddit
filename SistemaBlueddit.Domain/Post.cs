@@ -63,5 +63,15 @@ namespace SistemaBlueddit.Domain
             }
             return this;
         }
+
+        public string PrintPost()
+        {
+            var topicsPrinted = "Topics:\n";
+            foreach(var topic in Topics)
+            {
+                topicsPrinted += $"\tTopic Name: {topic.Name}\n";
+            }
+            return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd}'";
+        }
     }
 }
