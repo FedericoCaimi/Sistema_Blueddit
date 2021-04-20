@@ -69,6 +69,12 @@ namespace SistemaBlueddit.Server.Logic
                     PrintPosts(filteredPosts);
         }
 
+        public void ShowPostByName(string postName)
+        {
+            var post = _posts.Find(post => post.Name == postName);
+            post.PrintPost();
+        }
+
         private void PrintPosts(List<Post> posts)
         {
             foreach(var post in posts)

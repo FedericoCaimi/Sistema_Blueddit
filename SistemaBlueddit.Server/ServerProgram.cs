@@ -34,6 +34,7 @@ namespace SistemaBlueddit.Server
                 Console.WriteLine("4 - Listar posts por orden de creado");
                 Console.WriteLine("5 - Listar posts por orden de creado y tema");
                 Console.WriteLine("6 - Listar posts por tema y orden de creado");
+                Console.WriteLine("7 - Mostrar un post especifico");
                 Console.WriteLine("99 - salir");
                 var option = Console.ReadLine();
                 switch (option)
@@ -55,6 +56,11 @@ namespace SistemaBlueddit.Server
                         break;
                     case "6":
                         postLogic.ShowPostsByTopicAndDate();
+                        break;
+                    case "7":
+                        Console.WriteLine("Nombre del post a mostrar:");
+                        var postName = Console.ReadLine();
+                        postLogic.ShowPostByName(postName);
                         break;
                     case "99":
                         _exit = true;
