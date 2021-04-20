@@ -75,6 +75,35 @@ namespace SistemaBlueddit.Server.Logic
             post.PrintPost();
         }
 
+        public void ShowTopicsWithMorePosts(List<Topic> topics)
+        {
+            var returnedTopics = topicsWithMorePosts(topics);
+            foreach (var t in returnedTopics)
+            {
+                t.PrintTopic();
+            }
+        }
+
+        private List<Topic> topicsWithMorePosts(List<Topic> topics){
+            var returnedTopics = new List<Topic>();
+            var maxNumberOfPosts = 0;
+            var numberOfPosts = 0;
+            foreach (var topic in topics)
+            {
+                numberOfPosts = _posts.Count(p => p.Topics.Contains(topic));
+                if(numberOfPosts > maxNumberOfPosts){
+                    maxNumberOfPosts = numberOfPosts;
+                    returnedTopics.Clear();
+                    returnedTopics.Add(topic);
+                }else if(numberOfPosts == maxNumberOfPosts){
+                    returnedTopics.Add(topic);
+                }
+                //var posts = _posts.FindAll(p =>p.Topics.co);
+            }
+            
+            return returnedTopics;
+        }
+
         private void PrintPosts(List<Post> posts)
         {
             foreach(var post in posts)

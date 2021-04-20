@@ -35,6 +35,7 @@ namespace SistemaBlueddit.Server
                 Console.WriteLine("5 - Listar posts por orden de creado y tema");
                 Console.WriteLine("6 - Listar posts por tema y orden de creado");
                 Console.WriteLine("7 - Mostrar un post especifico");
+                Console.WriteLine("8 - Mostrar un tema o temas con mas publicaciones");
                 Console.WriteLine("99 - salir");
                 var option = Console.ReadLine();
                 switch (option)
@@ -61,6 +62,10 @@ namespace SistemaBlueddit.Server
                         Console.WriteLine("Nombre del post a mostrar:");
                         var postName = Console.ReadLine();
                         postLogic.ShowPostByName(postName);
+                        break;
+                    case "8":
+                        var topics = topicLogic.Topics();
+                        postLogic.ShowTopicsWithMorePosts(topics);
                         break;
                     case "99":
                         _exit = true;
