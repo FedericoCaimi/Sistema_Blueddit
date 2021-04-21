@@ -41,5 +41,11 @@ namespace SistemaBlueddit.Domain
             }
             return this;
         }
+
+        public override bool Equals(object obj) 
+        { 
+            var topic = obj as Topic; 
+            return topic != null && Name == topic.Name; 
+        }
     }
 }

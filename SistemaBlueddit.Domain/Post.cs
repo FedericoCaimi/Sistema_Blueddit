@@ -21,7 +21,7 @@ namespace SistemaBlueddit.Domain
                 serializedTopics += topic.SerializeObejct() + ",";
             }
             serializedTopics = serializedTopics.Remove(serializedTopics.Length - 1);
-            return $"{{name:{Name},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd}'}}";
+            return $"{{name:{Name},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd HH:mm:ss}'}}";
         }
 
         public Post DeserializeObject(string objectToDeserialize)
@@ -71,7 +71,7 @@ namespace SistemaBlueddit.Domain
             {
                 topicsPrinted += $"\tTopic Name: {topic.Name}\n";
             }
-            return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd}'";
+            return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd HH:mm:ss}'";
         }
     }
 }

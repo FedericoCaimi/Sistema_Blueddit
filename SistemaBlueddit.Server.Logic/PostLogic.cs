@@ -27,8 +27,17 @@ namespace SistemaBlueddit.Server.Logic
 
         public void AddPost(Post post)
         {
-            post.CreationDate = _posts.Count > 0 ? _posts.LastOrDefault().CreationDate.AddDays(-1) : post.CreationDate;
             _posts.Add(post);
+        }
+
+        public void ClearPosts()
+        {
+            _posts = new List<Post>();
+        }
+
+        public void AddPosts(List<Post> posts)
+        {
+            _posts.AddRange(posts);
         }
 
         public void ShowPostsByTopic(){
@@ -72,19 +81,19 @@ namespace SistemaBlueddit.Server.Logic
         public void ShowPostByName(string postName)
         {
             var post = _posts.Find(post => post.Name == postName);
-            post.PrintPost();
+            Console.WriteLine(post.PrintPost());
         }
 
         public void ShowTopicsWithMorePosts(List<Topic> topics)
         {
-            var returnedTopics = topicsWithMorePosts(topics);
+            var returnedTopics = TopicsWithMorePosts(topics);
             foreach (var t in returnedTopics)
             {
-                t.PrintTopic();
+                Console.WriteLine(t.PrintTopic());
             }
         }
 
-        private List<Topic> topicsWithMorePosts(List<Topic> topics){
+        private List<Topic> TopicsWithMorePosts(List<Topic> topics){
             var returnedTopics = new List<Topic>();
             var maxNumberOfPosts = 0;
             var numberOfPosts = 0;
@@ -98,7 +107,6 @@ namespace SistemaBlueddit.Server.Logic
                 }else if(numberOfPosts == maxNumberOfPosts){
                     returnedTopics.Add(topic);
                 }
-                //var posts = _posts.FindAll(p =>p.Topics.co);
             }
             
             return returnedTopics;

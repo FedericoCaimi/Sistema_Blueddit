@@ -28,6 +28,7 @@ namespace SistemaBlueddit.Server
             while (!_exit)
             {
                 Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
+                Console.WriteLine("0 - Cargar datos de prueba (si ya estan cargados se sobrescriben)");
                 Console.WriteLine("1 - Listar clientes conectados");
                 Console.WriteLine("2 - Listar todos los temas del sistema");
                 Console.WriteLine("3 - Listar posts por tema");
@@ -40,6 +41,14 @@ namespace SistemaBlueddit.Server
                 var option = Console.ReadLine();
                 switch (option)
                 {
+                    case "0":
+                        var mockedTopics = LoadMockData.LoadTopicsMockData();
+                        var mockedPosts = LoadMockData.LoadPostsMockData(mockedTopics);
+                        topicLogic.ClearTopics();
+                        postLogic.ClearPosts();
+                        topicLogic.AddTopics(mockedTopics);
+                        postLogic.AddPosts(mockedPosts);
+                        break;
                     case "1":
                         userLogic.ShowUsers();
                         break;

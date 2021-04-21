@@ -29,6 +29,16 @@ namespace SistemaBlueddit.Server.Logic
             _topics.Add(topic);
         }
 
+        public void ClearTopics()
+        {
+            _topics = new List<Topic>();
+        }
+
+        public void AddTopics(List<Topic> topics)
+        {
+            _topics.AddRange(topics);
+        }
+
         public List<Topic> Topics()
         {
             return _topics;
