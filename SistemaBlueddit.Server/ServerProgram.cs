@@ -129,12 +129,16 @@ namespace SistemaBlueddit.Server
                 {
                     var networkStream = acceptedClient.GetStream();
                     var header = HeaderHandler.DecodeHeader(networkStream);
+                    HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
+                    var serverResponse = "";
                     switch (header.Command)
                     {
                         case 01:
                             var topic = topicLogic.RecieveTopic(header, networkStream);
                             Console.WriteLine(topic.PrintTopic());
                             topicLogic.AddTopic(topic);
+                            serverResponse = "El tema se ha creado con exito";
+                            DataHandler.SendResponse(acceptedClient, serverResponse);
                             break;
                         case 02:
                             var post = postLogic.RecievePost(header, networkStream);
@@ -145,6 +149,8 @@ namespace SistemaBlueddit.Server
                                 Console.WriteLine(postTopic.PrintTopic());
                             }
                             postLogic.AddPost(post);
+                            serverResponse = "El post se ha creado con exito";
+                            DataHandler.SendResponse(acceptedClient, serverResponse);
                             break;
                         default:
                             Console.WriteLine("Opcion invalida...");

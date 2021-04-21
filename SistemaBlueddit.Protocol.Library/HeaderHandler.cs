@@ -44,7 +44,6 @@ namespace SistemaBlueddit.Protocol.Library
                     FileNameLength = fileNameLength,
                     HeaderMethod = headerMethod
                 };
-                ValidateHeader(header);
                 return header;
 
             }
@@ -54,9 +53,12 @@ namespace SistemaBlueddit.Protocol.Library
             }
         }
 
-        private static void ValidateHeader(Header header)
+        public static void ValidateHeader(Header header, string headerMethod, short? command = null)
         {
-
+            if (!(header.HeaderMethod.Equals(headerMethod) && (command.HasValue ? header.Command == command : true)))
+            {
+                throw new Exception("Header invalido");
+            }
         }
     }
 }
