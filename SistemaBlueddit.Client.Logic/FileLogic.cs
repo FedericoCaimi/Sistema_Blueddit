@@ -16,11 +16,11 @@ namespace SistemaBlueddit.Client.Logic
         public void SendFile(string option, string path, TcpClient connectedClient)
         {
             var fileHandler = new FileHandler();
-            //var fileStreamHandler = new FileStreamHandler();
+
             var fileSize = fileHandler.GetFileSize(path);
             var fileName = fileHandler.GetFileName(path);
             var fileNameLength = fileName.Length;
-            //var header = ProtocolHelper.CreateHeader(fileName, fileSize);
+
             var command = Convert.ToInt16(option);
             var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, fileSize, fileNameLength);
             var connectionStream = connectedClient.GetStream();

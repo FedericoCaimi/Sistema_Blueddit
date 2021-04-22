@@ -130,7 +130,7 @@ namespace SistemaBlueddit.Server
                 {
                     var networkStream = acceptedClient.GetStream();
                     var header = HeaderHandler.DecodeHeader(networkStream);
-                    //HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
+                    HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
                     var serverResponse = "";
                     Console.WriteLine("comand: "+header.Command);
                     switch (header.Command)

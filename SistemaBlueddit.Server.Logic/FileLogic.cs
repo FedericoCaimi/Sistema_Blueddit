@@ -48,7 +48,7 @@ namespace SistemaBlueddit.Server.Logic
                 }
                 currentPart++;
             }
-            fileHandler.WriteFile("./Archivos/"+fileName,rawFileInMemory);
+            fileHandler.WriteFile("./Files/"+fileName,rawFileInMemory);
 
         }
         private byte[] Read(int length, NetworkStream stream)
