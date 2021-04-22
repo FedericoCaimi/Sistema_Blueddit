@@ -17,6 +17,7 @@ namespace SistemaBlueddit.Client
         {
             var topicLogic = new TopicLogic();
             var postLogic = new PostLogic();
+            var fileLogic = new FileLogic();
 
             Console.WriteLine("Cliente se esta iniciando");
 
@@ -35,6 +36,7 @@ namespace SistemaBlueddit.Client
                     Console.WriteLine("Bienvenido al Sistema Blueddit");
                     Console.WriteLine("1 - Crear un nuevo tema");
                     Console.WriteLine("2 - Crear un nuevo post");
+                    Console.WriteLine("3 - Enviar archivo");
                     Console.WriteLine("99 - salir");
                     var option = Console.ReadLine();
                     switch (option)
@@ -44,6 +46,11 @@ namespace SistemaBlueddit.Client
                             break;
                         case "2":
                             postLogic.SendPost(tcpClient, option);
+                            break;
+                        case "3":
+                            Console.WriteLine("Escriba el path completo del archivo a subir...");
+                            var path = Console.ReadLine();
+                            fileLogic.SendFile(option, path, tcpClient);
                             break;
                         case "99":
                             exit = true;

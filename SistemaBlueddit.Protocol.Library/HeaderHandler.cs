@@ -8,7 +8,7 @@ namespace SistemaBlueddit.Protocol.Library
 {
     public static class HeaderHandler
     {
-        public static byte[] EncodeHeader(string headerMethod, short command, int dataLength, int fileNameLength)
+        public static byte[] EncodeHeader(string headerMethod, short command, long dataLength, int fileNameLength)
         {
             var method = Encoding.UTF8.GetBytes(headerMethod);
             var header = new byte[HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength];

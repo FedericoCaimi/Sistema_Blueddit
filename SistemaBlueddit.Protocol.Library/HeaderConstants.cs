@@ -8,5 +8,6 @@
         public static string Request = "REQ";
         public static string Response = "RES";
         public static int FileNameLength = 4;
+        public static int MaxPacketSize = 32768;
     }
 }

@@ -15,6 +15,7 @@ namespace SistemaBlueddit.Server
         public static UserLogic userLogic = new UserLogic();
         public static TopicLogic topicLogic = new TopicLogic();
         public static PostLogic postLogic = new PostLogic();
+        public static FileLogic fileLogic = new FileLogic();
 
         static void Main(string[] args)
         {
@@ -129,8 +130,9 @@ namespace SistemaBlueddit.Server
                 {
                     var networkStream = acceptedClient.GetStream();
                     var header = HeaderHandler.DecodeHeader(networkStream);
-                    HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
+                    //HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
                     var serverResponse = "";
+                    Console.WriteLine("comand: "+header.Command);
                     switch (header.Command)
                     {
                         case 01:
@@ -151,6 +153,9 @@ namespace SistemaBlueddit.Server
                             postLogic.AddPost(post);
                             serverResponse = "El post se ha creado con exito";
                             DataHandler.SendResponse(acceptedClient, serverResponse);
+                            break;
+                        case 03:
+                            fileLogic.GetFile(header, networkStream);
                             break;
                         default:
                             Console.WriteLine("Opcion invalida...");
