@@ -24,8 +24,8 @@ namespace SistemaBlueddit.Client
             var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0));
             tcpClient.Connect(IPAddress.Parse("127.0.0.1"), 50000);
 
-            var handleResponseThread = new Thread(() => HandleResponse(tcpClient));
-            handleResponseThread.Start();
+            //var handleResponseThread = new Thread(() => HandleResponse(tcpClient));
+            //handleResponseThread.Start();
 
             Console.WriteLine("Cliente se conectó al servidor.");
 
@@ -33,22 +33,32 @@ namespace SistemaBlueddit.Client
             {
                 while (!exit)
                 {
-                    Console.WriteLine("Bienvenido al Sistema Blueddit");
-                    Console.WriteLine("1 - Crear un nuevo tema");
-                    Console.WriteLine("2 - Crear un nuevo post");
-                    Console.WriteLine("3 - Enviar archivo");
-                    Console.WriteLine("99 - salir");
+                    Console.WriteLine("***************************************");
+                    Console.WriteLine("*   Bienvenido al Sistema Blueddit    *");
+                    Console.WriteLine("***************************************");
+                    Console.WriteLine("* 1 - Crear un nuevo tema             *");
+                    Console.WriteLine("* 2 - Crear un nuevo post             *");
+                    Console.WriteLine("* 3 - Subir archivo a una publicacion *");
+                    Console.WriteLine("* 99 - salir                          *");
+                    Console.WriteLine("***************************************");
                     var option = Console.ReadLine();
                     switch (option)
                     {
                         case "1":
                             topicLogic.SendTopic(tcpClient, option);
+                            HandleResponse(tcpClient);
                             break;
                         case "2":
                             postLogic.SendPost(tcpClient, option);
+                            HandleResponse(tcpClient);
                             break;
                         case "3":
-                            Console.WriteLine("Escriba el path completo del archivo a subir...");
+                            //Console.WriteLine("Escriba el nombre de la publicacion");
+                            //var name = Console.ReadLine();
+                            //postLogic.ExistsPost(tcpClient, option, name);
+                            //HandleResponse(tcpClient);
+                            //if()
+                            Console.WriteLine("Escriba el path completo del archivo a subir");
                             var path = Console.ReadLine();
                             fileLogic.SendFile(option, path, tcpClient);
                             break;
@@ -71,8 +81,8 @@ namespace SistemaBlueddit.Client
 
         private static void HandleResponse(TcpClient tcpClient)
         {
-            while (!exit)
-            {
+            //while (!exit)
+            //{
                 var connectionStream = tcpClient.GetStream();
                 var header = HeaderHandler.DecodeHeader(connectionStream);
                 HeaderHandler.ValidateHeader(header, HeaderConstants.Response, 00);
@@ -81,7 +91,8 @@ namespace SistemaBlueddit.Client
                 var responseJson = Encoding.UTF8.GetString(responseData);
                 var response = new Response().DeserializeObject(responseJson);
                 Console.WriteLine(response.ServerResponse);
-            }
+
+            //}
         }
     }
 }

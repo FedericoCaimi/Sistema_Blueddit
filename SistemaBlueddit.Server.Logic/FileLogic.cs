@@ -1,8 +1,6 @@
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
@@ -18,10 +16,8 @@ namespace SistemaBlueddit.Server.Logic
         public void GetFile(Header header, NetworkStream networkStream)
         {
             var fileHandler = new FileHandler();
-            //var networkStream = client.GetStream();
-            //var header = Read(ProtocolHelper.GetLength(),networkStream);
-            var fileNameSize = header.FileNameLength;//BitConverter.ToInt32(header,0);
-            var fileSize = header.DataLength;//BitConverter.ToInt32(header,ProtocolSpecification.FileNameLength);
+            var fileNameSize = header.FileNameLength;
+            var fileSize = header.DataLength;
 
             var fileName = Encoding.UTF8.GetString(Read(fileNameSize, networkStream));
 

@@ -12,9 +12,9 @@ namespace SistemaBlueddit.Client.Logic
         {
             var post = CreatePost();
             var postSerialized = post.SerializeObejct();
-            var postlength = postSerialized.Length;
+            var postLength = postSerialized.Length;
             var command = Convert.ToInt16(option);
-            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, postlength, 0);
+            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, postLength, 0);
             var connectionStream = connectedClient.GetStream();
             connectionStream.Write(header);
             DataHandler.SendData(connectedClient, postSerialized);
@@ -56,6 +56,15 @@ namespace SistemaBlueddit.Client.Logic
             newPost.Topics = postTopics;
             newPost.CreationDate = DateTime.Now;
             return newPost;
+        }
+
+        public void ExistsPost(TcpClient connectedClient, string option, string name){
+            var postNameLength = name.Length;
+            var command = Convert.ToInt16(option);
+            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, postNameLength, 0);
+            var connectionStream = connectedClient.GetStream();
+            connectionStream.Write(header);
+            DataHandler.SendData(connectedClient, name);
         }
     }
 }
