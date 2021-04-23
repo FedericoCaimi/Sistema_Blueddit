@@ -82,8 +82,9 @@ namespace SistemaBlueddit.Client
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine("Ha habido un error: " + e.Message);
                 Console.WriteLine("Se perdió la conexión con el servidor.");
             }
         }

@@ -80,7 +80,7 @@ namespace SistemaBlueddit.Server.Logic
 
         public void ShowPostByName(string postName)
         {
-            var post = _posts.Find(post => post.Name == postName);
+            var post = _posts.Where(post => post.Name == postName).FirstOrDefault();
             Console.WriteLine(post.PrintPost());
         }
 
@@ -136,9 +136,15 @@ namespace SistemaBlueddit.Server.Logic
             }
         }
 
-        public void AddFileToPost(string filePath, Post existingPost)
+        public void AddFileToPost(BluedditFile file, Post existingPost)
         {
-            existingPost.FilePath = filePath;
+            existingPost.File = file;
+        }
+
+        public BluedditFile GetFileFromPostName(string name)
+        {
+            var post = _posts.Where(p => p.Name.Equals(name)).FirstOrDefault();
+            return post != null ? post.File : null;
         }
     }
 }

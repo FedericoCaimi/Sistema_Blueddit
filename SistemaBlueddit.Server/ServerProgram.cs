@@ -38,6 +38,7 @@ namespace SistemaBlueddit.Server
                 Console.WriteLine("6 - Listar posts por tema y orden de creado");
                 Console.WriteLine("7 - Mostrar un post especifico");
                 Console.WriteLine("8 - Mostrar un tema o temas con mas publicaciones");
+                Console.WriteLine("9 - Mostrar archivo asociado a un post");
                 Console.WriteLine("99 - salir");
                 var option = Console.ReadLine();
                 switch (option)
@@ -76,6 +77,20 @@ namespace SistemaBlueddit.Server
                     case "8":
                         var topics = topicLogic.Topics();
                         postLogic.ShowTopicsWithMorePosts(topics);
+                        break;
+                    case "9":
+                        Console.WriteLine("Nombre del post del cual se desea obtener el archivo:");
+                        var post = Console.ReadLine();
+                        var file = postLogic.GetFileFromPostName(post);
+                        if(file != null)
+                        {
+                            Console.WriteLine(file.PrintFile(false));
+                        }
+                        else
+                        {
+                            Console.WriteLine("El post no existe o no tiene archivos");
+                        }
+                        
                         break;
                     case "99":
                         _exit = true;
@@ -161,9 +176,9 @@ namespace SistemaBlueddit.Server
                                 DataHandler.SendResponse(acceptedClient, "existe");
                                 header = HeaderHandler.DecodeHeader(networkStream);
                                 HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
-                                var filePath = fileLogic.GetFile(header, networkStream);
-                                Console.WriteLine(filePath);
-                                postLogic.AddFileToPost(filePath, existingPost);
+                                var bluedditFile = fileLogic.GetFile(header, networkStream);
+                                Console.WriteLine(bluedditFile.FileName);
+                                postLogic.AddFileToPost(bluedditFile, existingPost);
                                 serverResponse = "El archivo se ha agregado al post con exito";
                                 DataHandler.SendResponse(acceptedClient, serverResponse);
                             }

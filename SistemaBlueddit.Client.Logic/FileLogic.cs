@@ -26,35 +26,42 @@ namespace SistemaBlueddit.Client.Logic
             var connectionStream = connectedClient.GetStream();
             
             Console.WriteLine($"FileName is: {fileName}, file size is: {fileSize}");
-            
-            connectionStream.Write(header);
-            connectionStream.Write(Encoding.UTF8.GetBytes(fileName));
 
-            var rawFile = fileHandler.ReadFile(path);
-            var parts = fileHandler.GetFileParts(fileSize);
-
-            long offset = 0;
-            long currentPart = 1;
-
-            while (fileSize > offset)
+            if (fileSize < Constants.MaxFileSize)
             {
-                Console.WriteLine($"Voy a enviar parte {currentPart} de {parts}");
-                if (currentPart == parts)
+                connectionStream.Write(header);
+                connectionStream.Write(Encoding.UTF8.GetBytes(fileName));
+
+                var rawFile = fileHandler.ReadFile(path);
+                var parts = fileHandler.GetFileParts(fileSize);
+
+                long offset = 0;
+                long currentPart = 1;
+
+                while (fileSize > offset)
                 {
-                    var lastPartSize = fileSize - offset;
-                    var dataToSend = new byte[lastPartSize];
-                    Array.Copy(rawFile,offset,dataToSend,0,lastPartSize);
-                    offset += lastPartSize;
-                    connectionStream.Write(dataToSend);
+                    Console.WriteLine($"Voy a enviar parte {currentPart} de {parts}");
+                    if (currentPart == parts)
+                    {
+                        var lastPartSize = fileSize - offset;
+                        var dataToSend = new byte[lastPartSize];
+                        Array.Copy(rawFile, offset, dataToSend, 0, lastPartSize);
+                        offset += lastPartSize;
+                        connectionStream.Write(dataToSend);
+                    }
+                    else
+                    {
+                        var dataToSend = new byte[HeaderConstants.MaxPacketSize];
+                        Array.Copy(rawFile, offset, dataToSend, 0, HeaderConstants.MaxPacketSize);
+                        offset += HeaderConstants.MaxPacketSize;
+                        connectionStream.Write(dataToSend);
+                    }
+                    currentPart++;
                 }
-                else
-                {
-                    var dataToSend = new byte[HeaderConstants.MaxPacketSize];
-                    Array.Copy(rawFile, offset, dataToSend, 0, HeaderConstants.MaxPacketSize);
-                    offset += HeaderConstants.MaxPacketSize;
-                    connectionStream.Write(dataToSend);
-                }
-                currentPart++;
+            }
+            else
+            {
+                Console.WriteLine("Archivo demasiado grande para ser enviado");
             }
         }
     }

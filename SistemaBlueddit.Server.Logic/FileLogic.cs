@@ -13,14 +13,14 @@ namespace SistemaBlueddit.Server.Logic
         {
         }
 
-        public string GetFile(Header header, NetworkStream networkStream)
+        public BluedditFile GetFile(Header header, NetworkStream networkStream)
         {
             var fileHandler = new FileHandler();
             var fileNameSize = header.FileNameLength;
             var fileSize = header.DataLength;
 
-            var fileName = Encoding.UTF8.GetString(Read(fileNameSize, networkStream));
-            var filePath = "./Files/" + DateTime.Now.ToString("yyyy-MM-dd-HHmmss") + "-" + fileName;
+            var fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmmss") + "-" + Encoding.UTF8.GetString(Read(fileNameSize, networkStream));
+            var filePath = "./Files/" + fileName;
             var parts = fileHandler.GetFileParts(fileSize);
             var offset = 0;
             var currentPart = 1;
@@ -33,19 +33,26 @@ namespace SistemaBlueddit.Server.Logic
                 {
                     var lastPartSize = fileSize - offset;
                     var data = Read(lastPartSize, networkStream);
-                    Array.Copy(data,0,rawFileInMemory,offset,lastPartSize);
+                    Array.Copy(data, 0, rawFileInMemory, offset, lastPartSize);
                     offset += lastPartSize;
                 }
                 else
                 {
                     var data = Read(HeaderConstants.MaxPacketSize, networkStream);
-                    Array.Copy(data,0,rawFileInMemory,offset,HeaderConstants.MaxPacketSize);
+                    Array.Copy(data, 0, rawFileInMemory, offset, HeaderConstants.MaxPacketSize);
                     offset += HeaderConstants.MaxPacketSize;
                 }
                 currentPart++;
             }
             fileHandler.WriteFile(filePath, rawFileInMemory);
-            return filePath;
+
+            return new BluedditFile
+            {
+                FileName = fileName,
+                FilePath = filePath,
+                FileSize = fileSize,
+                CreationDate = DateTime.Now
+            };
         }
         private byte[] Read(int length, NetworkStream stream)
         {
