@@ -13,14 +13,14 @@ namespace SistemaBlueddit.Server.Logic
         {
         }
 
-        public void GetFile(Header header, NetworkStream networkStream)
+        public string GetFile(Header header, NetworkStream networkStream)
         {
             var fileHandler = new FileHandler();
             var fileNameSize = header.FileNameLength;
             var fileSize = header.DataLength;
 
             var fileName = Encoding.UTF8.GetString(Read(fileNameSize, networkStream));
-
+            var filePath = "./Files/" + DateTime.Now.ToString("yyyy-MM-dd-HHmmss") + "-" + fileName;
             var parts = fileHandler.GetFileParts(fileSize);
             var offset = 0;
             var currentPart = 1;
@@ -44,8 +44,8 @@ namespace SistemaBlueddit.Server.Logic
                 }
                 currentPart++;
             }
-            fileHandler.WriteFile("./Files/"+fileName,rawFileInMemory);
-
+            fileHandler.WriteFile(filePath, rawFileInMemory);
+            return filePath;
         }
         private byte[] Read(int length, NetworkStream stream)
         {

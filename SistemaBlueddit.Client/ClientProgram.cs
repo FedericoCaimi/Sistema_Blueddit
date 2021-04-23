@@ -42,25 +42,34 @@ namespace SistemaBlueddit.Client
                     Console.WriteLine("* 99 - salir                          *");
                     Console.WriteLine("***************************************");
                     var option = Console.ReadLine();
+                    Response response;
                     switch (option)
                     {
                         case "1":
                             topicLogic.SendTopic(tcpClient, option);
-                            HandleResponse(tcpClient);
+                            response = HandleResponse(tcpClient);
+                            Console.WriteLine(response.ServerResponse);
                             break;
                         case "2":
                             postLogic.SendPost(tcpClient, option);
-                            HandleResponse(tcpClient);
+                            response = HandleResponse(tcpClient);
+                            Console.WriteLine(response.ServerResponse);
                             break;
                         case "3":
-                            //Console.WriteLine("Escriba el nombre de la publicacion");
-                            //var name = Console.ReadLine();
-                            //postLogic.ExistsPost(tcpClient, option, name);
-                            //HandleResponse(tcpClient);
-                            //if()
-                            Console.WriteLine("Escriba el path completo del archivo a subir");
-                            var path = Console.ReadLine();
-                            fileLogic.SendFile(option, path, tcpClient);
+                            Console.WriteLine("Escriba el nombre de la publicacion");
+                            var name = Console.ReadLine();
+                            postLogic.ExistsPost(tcpClient, option, name);
+                            response = HandleResponse(tcpClient);
+                            if (response.ServerResponse.Equals("existe"))
+                            {
+                                Console.WriteLine("Escriba el path completo del archivo a subir");
+                                var path = Console.ReadLine();
+                                fileLogic.SendFile(option, path, tcpClient);
+                            }
+                            else
+                            {
+                                Console.WriteLine("No existe el nombre de la publicacion ingresada");
+                            }
                             break;
                         case "99":
                             exit = true;
@@ -79,20 +88,15 @@ namespace SistemaBlueddit.Client
             }
         }
 
-        private static void HandleResponse(TcpClient tcpClient)
+        private static Response HandleResponse(TcpClient tcpClient)
         {
-            //while (!exit)
-            //{
-                var connectionStream = tcpClient.GetStream();
-                var header = HeaderHandler.DecodeHeader(connectionStream);
-                HeaderHandler.ValidateHeader(header, HeaderConstants.Response, 00);
-                var responseData = new byte[header.DataLength];
-                connectionStream.Read(responseData, 0, header.DataLength);
-                var responseJson = Encoding.UTF8.GetString(responseData);
-                var response = new Response().DeserializeObject(responseJson);
-                Console.WriteLine(response.ServerResponse);
-
-            //}
+            var connectionStream = tcpClient.GetStream();
+            var header = HeaderHandler.DecodeHeader(connectionStream);
+            HeaderHandler.ValidateHeader(header, HeaderConstants.Response, 00);
+            var responseData = new byte[header.DataLength];
+            connectionStream.Read(responseData, 0, header.DataLength);
+            var responseJson = Encoding.UTF8.GetString(responseData);
+            return new Response().DeserializeObject(responseJson);
         }
     }
 }

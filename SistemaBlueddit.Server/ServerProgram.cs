@@ -132,7 +132,6 @@ namespace SistemaBlueddit.Server
                     var header = HeaderHandler.DecodeHeader(networkStream);
                     HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
                     var serverResponse = "";
-                    Console.WriteLine("comand: "+header.Command);
                     switch (header.Command)
                     {
                         case 01:
@@ -144,6 +143,7 @@ namespace SistemaBlueddit.Server
                             break;
                         case 02:
                             var post = postLogic.RecievePost(header, networkStream);
+                            postLogic.ValidatePost(post);
                             topicLogic.ValidateTopics(post.Topics);
                             Console.WriteLine("Nombre de la publicacion: " + post.Name);
                             foreach (var postTopic in post.Topics)
@@ -155,7 +155,22 @@ namespace SistemaBlueddit.Server
                             DataHandler.SendResponse(acceptedClient, serverResponse);
                             break;
                         case 03:
-                            fileLogic.GetFile(header, networkStream);
+                            var existingPost = postLogic.GetPostWithName(header, networkStream);
+                            if (existingPost != null)
+                            {
+                                DataHandler.SendResponse(acceptedClient, "existe");
+                                header = HeaderHandler.DecodeHeader(networkStream);
+                                HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
+                                var filePath = fileLogic.GetFile(header, networkStream);
+                                Console.WriteLine(filePath);
+                                postLogic.AddFileToPost(filePath, existingPost);
+                                serverResponse = "El archivo se ha agregado al post con exito";
+                                DataHandler.SendResponse(acceptedClient, serverResponse);
+                            }
+                            else
+                            {
+                                DataHandler.SendResponse(acceptedClient, "noexiste");
+                            }
                             break;
                         default:
                             Console.WriteLine("Opcion invalida...");

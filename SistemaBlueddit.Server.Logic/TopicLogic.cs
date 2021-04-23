@@ -56,7 +56,7 @@ namespace SistemaBlueddit.Server.Logic
         {
             topics.ForEach((topic) =>
             {
-                if(!_topics.Exists(t => t.Name == topic.Name))
+                if(!_topics.Exists(t => t.Name.Equals(topic.Name)))
                 {
                     throw new Exception("Tema no existe");
                 }

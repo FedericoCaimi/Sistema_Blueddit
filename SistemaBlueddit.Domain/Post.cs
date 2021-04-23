@@ -13,6 +13,8 @@ namespace SistemaBlueddit.Domain
 
         public DateTime CreationDate { get; set; }
 
+        public String FilePath { get; set; }
+
         public string SerializeObejct()
         {
             var serializedTopics = "";
@@ -21,7 +23,7 @@ namespace SistemaBlueddit.Domain
                 serializedTopics += topic.SerializeObejct() + ",";
             }
             serializedTopics = serializedTopics.Remove(serializedTopics.Length - 1);
-            return $"{{name:{Name},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd HH:mm:ss}'}}";
+            return $"{{name:{Name},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd HH:mm:ss}',filePath:{FilePath}}}";
         }
 
         public Post DeserializeObject(string objectToDeserialize)
@@ -57,6 +59,9 @@ namespace SistemaBlueddit.Domain
                         var creationDate = propertyValue.Replace("'", "");
                         CreationDate = Convert.ToDateTime(creationDate);
                         break;
+                    case ("filePath"):
+                        FilePath = propertyValue;
+                        break;
                     default:
                         throw new Exception("Objeto no es del tipo post");
                 }
@@ -71,7 +76,7 @@ namespace SistemaBlueddit.Domain
             {
                 topicsPrinted += $"\tTopic Name: {topic.Name}\n";
             }
-            return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd HH:mm:ss}'";
+            return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd HH:mm:ss}'\nFilePath: {FilePath}";
         }
     }
 }

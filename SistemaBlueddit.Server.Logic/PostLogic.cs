@@ -119,5 +119,26 @@ namespace SistemaBlueddit.Server.Logic
                 Console.WriteLine(post.PrintPost());
             }
         }
+
+        public Post GetPostWithName(Header header, NetworkStream networkStream)
+        {
+            var data = new byte[header.DataLength];
+            networkStream.Read(data, 0, header.DataLength);
+            var postName = Encoding.UTF8.GetString(data);
+            return _posts.FirstOrDefault(p => p.Name.Equals(postName));
+        }
+
+        public void ValidatePost(Post post)
+        {
+            if (_posts.Exists(p => p.Name.Equals(post.Name)))
+            {
+                throw new Exception("Error. No se pueden agregar posts duplicados");
+            }
+        }
+
+        public void AddFileToPost(string filePath, Post existingPost)
+        {
+            existingPost.FilePath = filePath;
+        }
     }
 }
