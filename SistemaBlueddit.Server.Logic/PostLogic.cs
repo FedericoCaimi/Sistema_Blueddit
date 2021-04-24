@@ -146,5 +146,12 @@ namespace SistemaBlueddit.Server.Logic
             var post = _posts.Where(p => p.Name.Equals(name)).FirstOrDefault();
             return post != null ? post.File : null;
         }
+
+        public void ShowFilesByNameAndTopics(string fileName, List<Topic> topicFiltrer){
+            foreach (var topic in topicFiltrer)
+            {
+                _posts.FindAll(p => p.Topics.Contains(topic));
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SistemaBlueddit.Protocol.Library;
+﻿using System.Collections.Generic;
+using SistemaBlueddit.Protocol.Library;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -29,16 +30,17 @@ namespace SistemaBlueddit.Server
             while (!_exit)
             {
                 Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
-                Console.WriteLine("0 - Cargar datos de prueba (si ya estan cargados se sobrescriben)");
-                Console.WriteLine("1 - Listar clientes conectados");
-                Console.WriteLine("2 - Listar todos los temas del sistema");
-                Console.WriteLine("3 - Listar posts por tema");
-                Console.WriteLine("4 - Listar posts por orden de creado");
-                Console.WriteLine("5 - Listar posts por orden de creado y tema");
-                Console.WriteLine("6 - Listar posts por tema y orden de creado");
-                Console.WriteLine("7 - Mostrar un post especifico");
-                Console.WriteLine("8 - Mostrar un tema o temas con mas publicaciones");
-                Console.WriteLine("9 - Mostrar archivo asociado a un post");
+                Console.WriteLine("0  - Cargar datos de prueba (si ya estan cargados se sobrescriben)");
+                Console.WriteLine("1  - Listar clientes conectados");
+                Console.WriteLine("2  - Listar todos los temas del sistema");
+                Console.WriteLine("3  - Listar posts por tema");
+                Console.WriteLine("4  - Listar posts por orden de creado");
+                Console.WriteLine("5  - Listar posts por orden de creado y tema");
+                Console.WriteLine("6  - Listar posts por tema y orden de creado");
+                Console.WriteLine("7  - Mostrar un post especifico");
+                Console.WriteLine("8  - Mostrar un tema o temas con mas publicaciones");
+                Console.WriteLine("9  - Mostrar archivo asociado a un post");
+                Console.WriteLine("10 - Mostrar listado de archivos");
                 Console.WriteLine("99 - salir");
                 var option = Console.ReadLine();
                 switch (option)
@@ -91,6 +93,46 @@ namespace SistemaBlueddit.Server
                             Console.WriteLine("El post no existe o no tiene archivos");
                         }
                         
+                        break;
+                    case "10":
+                        Console.WriteLine("Desea filtar por tema? (s para confirmar)");
+                        var confirm = Console.ReadLine();
+                        var topicFiltrer = new List<Topic>();
+                        if(confirm.Equals("s"))
+                        {
+                            Console.WriteLine("Elija los nombres de los temas a filtrar: (s para salir)");
+                            var exitFilter = "";
+                            while(!exitFilter.Equals("s"))
+                            {
+                               Console.WriteLine("Nombre del tema:");
+                               var topicName = Console.ReadLine();
+                               var topic = topicLogic.GetTopicByName(topicName);
+                               if(topic == null){
+                                   Console.WriteLine("El tema no existe");
+                               }else
+                               {
+                                   topicFiltrer.Add(topic);
+                               }
+                            }
+                        }
+                        Console.WriteLine("Mostrar por:");
+                        Console.WriteLine("1 - Fecha");
+                        Console.WriteLine("2 - Nombre");
+                        Console.WriteLine("3 - Tamaño");
+                        switch (option)
+                        {
+                            case "1":
+                                break;
+                            case "2":
+                                var fileName = Console.ReadLine();
+                                postLogic.ShowFilesByNameAndTopics(fileName, topicFiltrer);
+                                break;
+                            case "3":
+                                break;
+                            default:
+                                Console.WriteLine("Opcion invalida...");
+                            break;
+                        }
                         break;
                     case "99":
                         _exit = true;

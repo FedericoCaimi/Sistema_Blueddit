@@ -66,5 +66,6 @@ namespace SistemaBlueddit.Client.Logic
             connectionStream.Write(header);
             DataHandler.SendData(connectedClient, name);
         }
+
     }
 }

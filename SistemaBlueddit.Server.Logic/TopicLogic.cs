@@ -1,6 +1,7 @@
 ﻿using SistemaBlueddit.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
@@ -61,6 +62,11 @@ namespace SistemaBlueddit.Server.Logic
                     throw new Exception("Tema no existe");
                 }
             });
+        }
+
+        public Topic GetTopicByName(string topicName)
+        {
+            return _topics.FirstOrDefault(p => p.Name.Equals(topicName));
         }
     }
 }
