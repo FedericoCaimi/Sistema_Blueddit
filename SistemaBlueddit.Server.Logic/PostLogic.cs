@@ -153,7 +153,29 @@ namespace SistemaBlueddit.Server.Logic
             posts.OrderBy(p => p.File.FileName);
             foreach (var post in posts)
             {
-                Console.WriteLine(post.File.PrintFile(true));
+                if(post.File != null) 
+                    Console.WriteLine(post.File.PrintFile(true));
+            }
+        }
+
+        public void ShowFilesByTopicsOrderBySize(List<Topic> topicFiltrer){
+            var posts = new List<Post>();
+            posts = _posts.FindAll(p => haveTopics(topicFiltrer, p));
+            posts.OrderBy(p => p.File.FileSize);
+            foreach (var post in posts)
+            {
+                if(post.File != null) 
+                    Console.WriteLine(post.File.PrintFile(true));
+            }
+        }
+        public void ShowFilesByTopicsOrderByDate(List<Topic> topicFiltrer){
+            var posts = new List<Post>();
+            posts = _posts.FindAll(p => haveTopics(topicFiltrer, p));
+            posts.OrderBy(p => p.File.CreationDate);
+            foreach (var post in posts)
+            {
+                if(post.File != null) 
+                    Console.WriteLine(post.File.PrintFile(true));
             }
         }
 

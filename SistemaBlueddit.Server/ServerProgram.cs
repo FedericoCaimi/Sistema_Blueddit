@@ -126,11 +126,13 @@ namespace SistemaBlueddit.Server
                         switch (filterOption)
                         {
                             case "1":
+                                postLogic.ShowFilesByTopicsOrderByDate(topicFiltrer);
                                 break;
                             case "2":
                                 postLogic.ShowFilesByTopicsOrderByName(topicFiltrer);
                                 break;
                             case "3":
+                                postLogic.ShowFilesByTopicsOrderBySize(topicFiltrer);
                                 break;
                             default:
                                 Console.WriteLine("Opcion invalida...");
