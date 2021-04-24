@@ -28,12 +28,27 @@ namespace SistemaBlueddit.Client.Logic
             Console.WriteLine("Descripcion:");
             var description = Console.ReadLine();
 
-            var gender = new Topic
+            var topic = new Topic
             {
                 Name = name,
                 Description = description
             };
-            return gender;
+            return topic;
+        }
+
+        public void DeleteTopic(TcpClient tcpClient, string option, string topicName)
+        {
+            var topic = new Topic
+            {
+                Name = topicName
+            };
+            var topicSerialized = topic.SerializeObejct();
+            var topiclength = topicSerialized.Length;
+            var command = Convert.ToInt16(option);
+            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, topiclength, 0);
+            var connectionStream = tcpClient.GetStream();
+            connectionStream.Write(header);
+            DataHandler.SendData(tcpClient, topicSerialized);
         }
     }
 }

@@ -67,5 +67,20 @@ namespace SistemaBlueddit.Client.Logic
             DataHandler.SendData(connectedClient, name);
         }
 
+        public void DeletePost(TcpClient tcpClient, string option, string postName)
+        {
+            var newPost = new Post 
+            {
+                Name = postName,
+                Topics = new List<Topic>()
+            };
+            var postSerialized = newPost.SerializeObejct();
+            var postLength = postSerialized.Length;
+            var command = Convert.ToInt16(option);
+            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, postLength, 0);
+            var connectionStream = tcpClient.GetStream();
+            connectionStream.Write(header);
+            DataHandler.SendData(tcpClient, postSerialized);
+        }
     }
 }

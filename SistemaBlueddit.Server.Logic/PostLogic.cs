@@ -120,7 +120,12 @@ namespace SistemaBlueddit.Server.Logic
             }
         }
 
-        public Post GetPostWithName(Header header, NetworkStream networkStream)
+        public Post GetPostByName(string postName)
+        {
+            return _posts.FirstOrDefault(p => p.Name.Equals(postName));
+        }
+
+        public Post GetPostByName(Header header, NetworkStream networkStream)
         {
             var data = new byte[header.DataLength];
             networkStream.Read(data, 0, header.DataLength);
@@ -191,6 +196,24 @@ namespace SistemaBlueddit.Server.Logic
                 }
             }
             return haveTopics;
+        }
+
+        public void DeletePost(Post existingPost)
+        {
+            _posts = _posts.Where(p => !p.Name.Equals(existingPost.Name)).ToList();
+        }
+
+        public bool IsTopicInPost(Topic existingTopic)
+        {
+            return _posts.FirstOrDefault(p => p.Topics.Contains(existingTopic)) != null;
+        }
+
+        public string ModifyPost(Post postToModify)
+        {
+            var existingPost = _posts.FirstOrDefault(p => p.Name == postToModify.Name);
+            existingPost.Name = postToModify.Name;
+            existingPost.Topics = postToModify.Topics;
+            return "Post modificado con exito";
         }
     }
 }

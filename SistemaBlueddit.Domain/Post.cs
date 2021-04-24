@@ -22,7 +22,9 @@ namespace SistemaBlueddit.Domain
             {
                 serializedTopics += topic.SerializeObejct() + ",";
             }
-            serializedTopics = serializedTopics.Remove(serializedTopics.Length - 1);
+            serializedTopics = !serializedTopics.Equals("") 
+                ? serializedTopics.Remove(serializedTopics.Length - 1) 
+                : serializedTopics;
             return $"{{name:{Name},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd HH:mm:ss}'}}";
         }
 
@@ -50,8 +52,11 @@ namespace SistemaBlueddit.Domain
                         foreach(var serializedTopic in serializedTopics)
                         {
                             var topicString = serializedTopic.Replace("|",",");
-                            var topic = new Topic().DeserializeObject(topicString);
-                            topics.Add(topic);
+                            if (!topicString.Equals(""))
+                            {
+                                var topic = new Topic().DeserializeObject(topicString);
+                                topics.Add(topic);
+                            }
                         }
                         Topics = topics;
                         break;

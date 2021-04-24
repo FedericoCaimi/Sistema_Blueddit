@@ -68,5 +68,33 @@ namespace SistemaBlueddit.Server.Logic
         {
             return _topics.FirstOrDefault(p => p.Name.Equals(topicName));
         }
+
+        public Topic GetTopicByName(Header header, NetworkStream networkStream)
+        {
+            var data = new byte[header.DataLength];
+            networkStream.Read(data, 0, header.DataLength);
+            var topicName = Encoding.UTF8.GetString(data);
+            return _topics.FirstOrDefault(t => t.Name.Equals(topicName));
+        }
+
+        public void DeleteTopic(Topic existingTopic)
+        {
+            _topics = _topics.Where(t => !t.Equals(existingTopic)).ToList();
+        }
+
+        public string ModifyTopic(Topic topic)
+        {
+            var existingTopic = GetTopicByName(topic.Name);
+            if(existingTopic != null)
+            {
+                var topicIndex = _topics.FindIndex(t => t.Equals(topic));
+                _topics[topicIndex] = topic;
+                return "El tema se modifico con exito";
+            }
+            else
+            {
+                return "El tema no existe";
+            }
+        }
     }
 }

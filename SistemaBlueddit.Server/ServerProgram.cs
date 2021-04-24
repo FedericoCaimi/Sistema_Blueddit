@@ -194,6 +194,7 @@ namespace SistemaBlueddit.Server
                     var header = HeaderHandler.DecodeHeader(networkStream);
                     HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
                     var serverResponse = "";
+                    Post existingPost;
                     switch (header.Command)
                     {
                         case 01:
@@ -217,7 +218,7 @@ namespace SistemaBlueddit.Server
                             DataHandler.SendResponse(acceptedClient, serverResponse);
                             break;
                         case 03:
-                            var existingPost = postLogic.GetPostWithName(header, networkStream);
+                            existingPost = postLogic.GetPostByName(header, networkStream);
                             if (existingPost != null)
                             {
                                 DataHandler.SendResponse(acceptedClient, "existe");
@@ -233,6 +234,50 @@ namespace SistemaBlueddit.Server
                             {
                                 DataHandler.SendResponse(acceptedClient, "noexiste");
                             }
+                            break;
+                        case 04:
+                            var topicToRemove = topicLogic.RecieveTopic(header, networkStream);
+                            var existingTopic = topicLogic.GetTopicByName(topicToRemove.Name);
+                            if (existingTopic != null)
+                            {
+                                if (postLogic.IsTopicInPost(existingTopic))
+                                {
+                                    DataHandler.SendResponse(acceptedClient, "Error. No se puede borrar el tema porque esta asociado a un post.");
+                                }
+                                else
+                                {
+                                    topicLogic.DeleteTopic(existingTopic);
+                                    DataHandler.SendResponse(acceptedClient, "El tema ingresado se ha borrado con exito.");
+                                }
+                            }
+                            else
+                            {
+                                DataHandler.SendResponse(acceptedClient, "No existe el tema con el nombre ingresado.");
+                            }
+                            break;
+                        case 05:
+                            var topicToModify = topicLogic.RecieveTopic(header, networkStream);
+                            var topicResponse = topicLogic.ModifyTopic(topicToModify);
+                            DataHandler.SendResponse(acceptedClient, topicResponse);
+                            break;
+                        case 06:
+                            var postToRemove = postLogic.RecievePost(header, networkStream);
+                            var existingPostToRemove = postLogic.GetPostByName(postToRemove.Name);
+                            if (existingPostToRemove != null)
+                            {
+                                postLogic.DeletePost(existingPostToRemove);
+                                DataHandler.SendResponse(acceptedClient, "El post ingresado se ha borrado con exito.");
+                            }
+                            else
+                            {
+                                DataHandler.SendResponse(acceptedClient, "No existe el post con el nombre ingresado.");
+                            }
+                            break;
+                        case 07:
+                            var postToModify = postLogic.RecievePost(header, networkStream);
+                            topicLogic.ValidateTopics(postToModify.Topics);
+                            var postResponse = postLogic.ModifyPost(postToModify);
+                            DataHandler.SendResponse(acceptedClient, postResponse);
                             break;
                         default:
                             Console.WriteLine("Opcion invalida...");

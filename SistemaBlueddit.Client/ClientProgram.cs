@@ -24,9 +24,6 @@ namespace SistemaBlueddit.Client
             var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0));
             tcpClient.Connect(IPAddress.Parse("127.0.0.1"), 50000);
 
-            //var handleResponseThread = new Thread(() => HandleResponse(tcpClient));
-            //handleResponseThread.Start();
-
             Console.WriteLine("Cliente se conectó al servidor.");
 
             try
@@ -39,6 +36,10 @@ namespace SistemaBlueddit.Client
                     Console.WriteLine("* 1 - Crear un nuevo tema             *");
                     Console.WriteLine("* 2 - Crear un nuevo post             *");
                     Console.WriteLine("* 3 - Subir archivo a una publicacion *");
+                    Console.WriteLine("* 4 - Dar de baja un tema             *");
+                    Console.WriteLine("* 5 - Modificar un tema               *");
+                    Console.WriteLine("* 6 - Dar de baja un post             *");
+                    Console.WriteLine("* 7 - Modificar un post               *");
                     Console.WriteLine("* 99 - salir                          *");
                     Console.WriteLine("***************************************");
                     var option = Console.ReadLine();
@@ -70,6 +71,30 @@ namespace SistemaBlueddit.Client
                             {
                                 Console.WriteLine("No existe el nombre de la publicacion ingresada");
                             }
+                            break;
+                        case "4":
+                            Console.WriteLine("Escriba el nombre del tema a dar de baja");
+                            var topicName = Console.ReadLine();
+                            topicLogic.DeleteTopic(tcpClient, option, topicName);
+                            response = HandleResponse(tcpClient);
+                            Console.WriteLine(response.ServerResponse);
+                            break;
+                        case "5":
+                            topicLogic.SendTopic(tcpClient, option);
+                            response = HandleResponse(tcpClient);
+                            Console.WriteLine(response.ServerResponse);
+                            break;
+                        case "6":
+                            Console.WriteLine("Escriba el nombre del post a dar de baja");
+                            var postName = Console.ReadLine();
+                            postLogic.DeletePost(tcpClient, option, postName);
+                            response = HandleResponse(tcpClient);
+                            Console.WriteLine(response.ServerResponse);
+                            break;
+                        case "7":
+                            postLogic.SendPost(tcpClient, option);
+                            response = HandleResponse(tcpClient);
+                            Console.WriteLine(response.ServerResponse);
                             break;
                         case "99":
                             exit = true;
