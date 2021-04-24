@@ -101,31 +101,34 @@ namespace SistemaBlueddit.Server
                         if(confirm.Equals("s"))
                         {
                             Console.WriteLine("Elija los nombres de los temas a filtrar: (s para salir)");
-                            var exitFilter = "";
-                            while(!exitFilter.Equals("s"))
+                            var exitFilter = false;
+                            while(!exitFilter)
                             {
-                               Console.WriteLine("Nombre del tema:");
-                               var topicName = Console.ReadLine();
-                               var topic = topicLogic.GetTopicByName(topicName);
-                               if(topic == null){
-                                   Console.WriteLine("El tema no existe");
-                               }else
-                               {
-                                   topicFiltrer.Add(topic);
-                               }
+                                Console.WriteLine("Nombre del tema:");
+                                var topicName = Console.ReadLine();
+                                if(!topicName.Equals("s")){
+                                    var topic = topicLogic.GetTopicByName(topicName);
+                                    if(topic == null){
+                                        Console.WriteLine("El tema no existe");
+                                    }else
+                                    {
+                                        topicFiltrer.Add(topic);
+                                    }
+                                }else
+                                    exitFilter = true;
                             }
                         }
                         Console.WriteLine("Mostrar por:");
                         Console.WriteLine("1 - Fecha");
                         Console.WriteLine("2 - Nombre");
                         Console.WriteLine("3 - Tamaño");
-                        switch (option)
+                        var filterOption = Console.ReadLine();
+                        switch (filterOption)
                         {
                             case "1":
                                 break;
                             case "2":
-                                var fileName = Console.ReadLine();
-                                postLogic.ShowFilesByNameAndTopics(fileName, topicFiltrer);
+                                postLogic.ShowFilesByTopicsOrderByName(topicFiltrer);
                                 break;
                             case "3":
                                 break;

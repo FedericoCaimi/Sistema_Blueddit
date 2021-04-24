@@ -147,11 +147,28 @@ namespace SistemaBlueddit.Server.Logic
             return post != null ? post.File : null;
         }
 
-        public void ShowFilesByNameAndTopics(string fileName, List<Topic> topicFiltrer){
-            foreach (var topic in topicFiltrer)
+        public void ShowFilesByTopicsOrderByName(List<Topic> topicFiltrer){
+            var posts = new List<Post>();
+            posts = _posts.FindAll(p => haveTopics(topicFiltrer, p));
+            posts.OrderBy(p => p.File.FileName);
+            foreach (var post in posts)
             {
-                _posts.FindAll(p => p.Topics.Contains(topic));
+                Console.WriteLine(post.File.PrintFile(true));
             }
+        }
+
+        private bool haveTopics(List<Topic> topics, Post p)
+        {
+            var haveTopics = true;
+            foreach (var topic in topics)
+            {
+                var haveTopic = p.Topics.Contains(topic);
+                if(!haveTopic){
+                    haveTopics = false;
+                    break;
+                }
+            }
+            return haveTopics;
         }
     }
 }
