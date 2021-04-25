@@ -2,99 +2,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using System.Text;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class TopicLogic
+    public class TopicLogic: Logic<Topic>
     {
-        private List<Topic> _topics;
-
-        public TopicLogic()
+        public bool ValidateTopics(List<Topic> topics)
         {
-            _topics = new List<Topic>();
-        }
-
-        public Topic RecieveTopic(Header header, NetworkStream stream)
-        {
-            var data = new byte[header.DataLength];
-            stream.Read(data, 0, header.DataLength);
-            var topicJson = Encoding.UTF8.GetString(data);
-            var topic = new Topic();
-            return topic.DeserializeObject(topicJson);
-        }
-
-        public void AddTopic(Topic topic)
-        {
-            _topics.Add(topic);
-        }
-
-        public void ClearTopics()
-        {
-            _topics = new List<Topic>();
-        }
-
-        public void AddTopics(List<Topic> topics)
-        {
-            _topics.AddRange(topics);
-        }
-
-        public List<Topic> Topics()
-        {
-            return _topics;
-        }
-
-        public void ShowTopics()
-        {
-            foreach (var topic in _topics)
+            var areTopicsValid = true;
+            foreach(var topic in topics)
             {
-                Console.WriteLine(topic.PrintTopic());
-            }
-        }
-
-        public void ValidateTopics(List<Topic> topics)
-        {
-            topics.ForEach((topic) =>
-            {
-                if(!_topics.Exists(t => t.Name.Equals(topic.Name)))
+                if (!_elements.Exists(t => t.Equals(topic)))
                 {
-                    throw new Exception("Tema no existe");
+                    areTopicsValid = false;
+                    break;
                 }
-            });
-        }
-
-        public Topic GetTopicByName(string topicName)
-        {
-            return _topics.FirstOrDefault(p => p.Name.Equals(topicName));
-        }
-
-        public Topic GetTopicByName(Header header, NetworkStream networkStream)
-        {
-            var data = new byte[header.DataLength];
-            networkStream.Read(data, 0, header.DataLength);
-            var topicName = Encoding.UTF8.GetString(data);
-            return _topics.FirstOrDefault(t => t.Name.Equals(topicName));
-        }
-
-        public void DeleteTopic(Topic existingTopic)
-        {
-            _topics = _topics.Where(t => !t.Equals(existingTopic)).ToList();
+            }
+            return areTopicsValid;
         }
 
         public string ModifyTopic(Topic topic)
         {
-            var existingTopic = GetTopicByName(topic.Name);
+            var existingTopic = GetByName(topic.Name);
             if(existingTopic != null)
             {
-                var topicIndex = _topics.FindIndex(t => t.Equals(topic));
-                _topics[topicIndex] = topic;
+                var topicIndex = _elements.FindIndex(t => t.Equals(topic));
+                _elements[topicIndex] = topic;
                 return "El tema se modifico con exito";
             }
             else
             {
                 return "El tema no existe";
             }
+        }
+
+        public override Topic GetByName(string name)
+        {
+            return _elements.FirstOrDefault(t => t.Name.Equals(name));
         }
     }
 }

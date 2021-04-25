@@ -2,95 +2,64 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using System.Text;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class PostLogic
+    public class PostLogic: Logic<Post>
     {
-        private List<Post> _posts;
-
-        public PostLogic()
-        {
-            _posts = new List<Post>();
-        }
-
-        public Post RecievePost(Header header, NetworkStream stream)
-        {
-            var data = new byte[header.DataLength];
-            stream.Read(data, 0, header.DataLength);
-            var postJson = Encoding.UTF8.GetString(data);
-            var post = new Post();
-            return post.DeserializeObject(postJson);
-        }
-
-        public void AddPost(Post post)
-        {
-            _posts.Add(post);
-        }
-
-        public void ClearPosts()
-        {
-            _posts = new List<Post>();
-        }
-
-        public void AddPosts(List<Post> posts)
-        {
-            _posts.AddRange(posts);
-        }
-
-        public void ShowPostsByTopic(){
+        public string ShowPostsByTopic(){
             var filteredPosts = new List<Post>();
-            filteredPosts = _posts.OrderBy(post => post.Topics
+            filteredPosts = _elements.OrderBy(post => post.Topics
                         .OrderBy(topic => topic.Name)
                         .Select(topic=>topic.Name)
                         .FirstOrDefault())
                         .ToList();
-                    PrintPosts(filteredPosts);
+            return ShowMultiple(filteredPosts);
         }
 
-        public void ShowPostsByDate(){
+        public string ShowPostsByDate(){
             var filteredPosts = new List<Post>();
-            filteredPosts = _posts.OrderBy(post => post.CreationDate).ToList();
-                    PrintPosts(filteredPosts);
+            filteredPosts = _elements.OrderBy(post => post.CreationDate).ToList();
+            return ShowMultiple(filteredPosts);
         }
 
-        public void ShowPostsByDateAndTopic(){
+        public string ShowPostsByDateAndTopic(){
             var filteredPosts = new List<Post>();
-            filteredPosts = _posts.OrderBy(post => post.CreationDate)
+            filteredPosts = _elements.OrderBy(post => post.CreationDate)
                         .ThenBy(post => post.Topics
                         .OrderBy(topic => topic.Name)
                         .Select(topic => topic.Name)
                         .FirstOrDefault())
                         .ToList();
-                    PrintPosts(filteredPosts);
+            return ShowMultiple(filteredPosts);
         }
 
-        public void ShowPostsByTopicAndDate(){
+        public string ShowPostsByTopicAndDate(){
             var filteredPosts = new List<Post>();
-            filteredPosts = _posts.OrderBy(post => post.Topics
+            filteredPosts = _elements.OrderBy(post => post.Topics
                         .OrderBy(topic => topic.Name)
                         .Select(topic => topic.Name)
                         .FirstOrDefault())
                         .ThenBy(post => post.CreationDate)
                         .ToList();
-                    PrintPosts(filteredPosts);
+            return ShowMultiple(filteredPosts);
         }
 
-        public void ShowPostByName(string postName)
+        public string ShowPostByName(string postName)
         {
-            var post = _posts.Where(post => post.Name == postName).FirstOrDefault();
-            Console.WriteLine(post.PrintPost());
+            var post = _elements.Where(post => post.Name == postName).FirstOrDefault();
+            return post != null ? Show(post) : "";
         }
 
-        public void ShowTopicsWithMorePosts(List<Topic> topics)
+        public string ShowTopicsWithMorePosts(List<Topic> topics)
         {
             var returnedTopics = TopicsWithMorePosts(topics);
+            var topicsToReturn = "";
             foreach (var t in returnedTopics)
             {
-                Console.WriteLine(t.PrintTopic());
+                topicsToReturn += t.Print() + "\n";
             }
+            return topicsToReturn;
         }
 
         private List<Topic> TopicsWithMorePosts(List<Topic> topics){
@@ -99,7 +68,7 @@ namespace SistemaBlueddit.Server.Logic
             var numberOfPosts = 0;
             foreach (var topic in topics)
             {
-                numberOfPosts = _posts.Count(p => p.Topics.Contains(topic));
+                numberOfPosts = _elements.Count(p => p.Topics.Contains(topic));
                 if(numberOfPosts > maxNumberOfPosts){
                     maxNumberOfPosts = numberOfPosts;
                     returnedTopics.Clear();
@@ -112,35 +81,6 @@ namespace SistemaBlueddit.Server.Logic
             return returnedTopics;
         }
 
-        private void PrintPosts(List<Post> posts)
-        {
-            foreach(var post in posts)
-            {
-                Console.WriteLine(post.PrintPost());
-            }
-        }
-
-        public Post GetPostByName(string postName)
-        {
-            return _posts.FirstOrDefault(p => p.Name.Equals(postName));
-        }
-
-        public Post GetPostByName(Header header, NetworkStream networkStream)
-        {
-            var data = new byte[header.DataLength];
-            networkStream.Read(data, 0, header.DataLength);
-            var postName = Encoding.UTF8.GetString(data);
-            return _posts.FirstOrDefault(p => p.Name.Equals(postName));
-        }
-
-        public void ValidatePost(Post post)
-        {
-            if (_posts.Exists(p => p.Name.Equals(post.Name)))
-            {
-                throw new Exception("Error. No se pueden agregar posts duplicados");
-            }
-        }
-
         public void AddFileToPost(BluedditFile file, Post existingPost)
         {
             existingPost.File = file;
@@ -148,43 +88,55 @@ namespace SistemaBlueddit.Server.Logic
 
         public BluedditFile GetFileFromPostName(string name)
         {
-            var post = _posts.Where(p => p.Name.Equals(name)).FirstOrDefault();
+            var post = _elements.Where(p => p.Name.Equals(name)).FirstOrDefault();
             return post != null ? post.File : null;
         }
 
-        public void ShowFilesByTopicsOrderByName(List<Topic> topicFiltrer){
+        public string ShowFilesByTopicsOrderByName(List<Topic> topicFiltrer){
             var posts = new List<Post>();
-            posts = _posts.FindAll(p => haveTopics(topicFiltrer, p));
+            posts = _elements.FindAll(p => HasTopics(topicFiltrer, p));
             posts.OrderBy(p => p.File.FileName);
+            var filesToReturn = "";
             foreach (var post in posts)
             {
-                if(post.File != null) 
-                    Console.WriteLine(post.File.PrintFile(true));
+                if(post.File != null)
+                {
+                    filesToReturn += post.File.PrintFile(true) + "\n";
+                }
             }
+            return filesToReturn;
         }
 
-        public void ShowFilesByTopicsOrderBySize(List<Topic> topicFiltrer){
+        public string ShowFilesByTopicsOrderBySize(List<Topic> topicFiltrer){
             var posts = new List<Post>();
-            posts = _posts.FindAll(p => haveTopics(topicFiltrer, p));
+            posts = _elements.FindAll(p => HasTopics(topicFiltrer, p));
             posts.OrderBy(p => p.File.FileSize);
+            var filesToReturn = "";
             foreach (var post in posts)
             {
-                if(post.File != null) 
-                    Console.WriteLine(post.File.PrintFile(true));
+                if (post.File != null)
+                {
+                    filesToReturn += post.File.PrintFile(true) + "\n";
+                }
             }
+            return filesToReturn;
         }
-        public void ShowFilesByTopicsOrderByDate(List<Topic> topicFiltrer){
+        public string ShowFilesByTopicsOrderByDate(List<Topic> topicFiltrer){
             var posts = new List<Post>();
-            posts = _posts.FindAll(p => haveTopics(topicFiltrer, p));
+            posts = _elements.FindAll(p => HasTopics(topicFiltrer, p));
             posts.OrderBy(p => p.File.CreationDate);
+            var filesToReturn = "";
             foreach (var post in posts)
             {
-                if(post.File != null) 
-                    Console.WriteLine(post.File.PrintFile(true));
+                if (post.File != null)
+                {
+                    filesToReturn += post.File.PrintFile(true) + "\n";
+                }
             }
+            return filesToReturn;
         }
 
-        private bool haveTopics(List<Topic> topics, Post p)
+        private bool HasTopics(List<Topic> topics, Post p)
         {
             var haveTopics = true;
             foreach (var topic in topics)
@@ -198,22 +150,36 @@ namespace SistemaBlueddit.Server.Logic
             return haveTopics;
         }
 
-        public void DeletePost(Post existingPost)
+        public bool ExistFilesInPosts()
         {
-            _posts = _posts.Where(p => !p.Name.Equals(existingPost.Name)).ToList();
+            var existFiles = false;
+            foreach(var post in _elements)
+            {
+                existFiles = post.File != null;
+                if (existFiles)
+                {
+                    break;
+                }
+            }
+            return existFiles;
         }
 
         public bool IsTopicInPost(Topic existingTopic)
         {
-            return _posts.FirstOrDefault(p => p.Topics.Contains(existingTopic)) != null;
+            return _elements.FirstOrDefault(p => p.Topics.Contains(existingTopic)) != null;
         }
 
         public string ModifyPost(Post postToModify)
         {
-            var existingPost = _posts.FirstOrDefault(p => p.Name == postToModify.Name);
+            var existingPost = _elements.FirstOrDefault(p => p.Name == postToModify.Name);
             existingPost.Name = postToModify.Name;
             existingPost.Topics = postToModify.Topics;
             return "Post modificado con exito";
+        }
+
+        public override Post GetByName(string name)
+        {
+            return _elements.FirstOrDefault(t => t.Name.Equals(name));
         }
     }
 }

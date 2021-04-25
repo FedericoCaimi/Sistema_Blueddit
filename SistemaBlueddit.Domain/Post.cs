@@ -71,7 +71,7 @@ namespace SistemaBlueddit.Domain
             return this;
         }
 
-        public string PrintPost()
+        public string Print()
         {
             var topicsPrinted = "Topics:\n";
             foreach(var topic in Topics)
@@ -80,6 +80,12 @@ namespace SistemaBlueddit.Domain
             }
             var filePrinted = File != null ? "\nFile:\n" + File.PrintFile(true) : "";
             return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd HH:mm:ss}'{filePrinted}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            var topic = obj as Post;
+            return topic != null && Name == topic.Name;
         }
     }
 }

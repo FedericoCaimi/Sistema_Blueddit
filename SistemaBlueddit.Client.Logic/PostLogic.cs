@@ -58,15 +58,6 @@ namespace SistemaBlueddit.Client.Logic
             return newPost;
         }
 
-        public void ExistsPost(TcpClient connectedClient, string option, string name){
-            var postNameLength = name.Length;
-            var command = Convert.ToInt16(option);
-            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, postNameLength, 0);
-            var connectionStream = connectedClient.GetStream();
-            connectionStream.Write(header);
-            DataHandler.SendData(connectedClient, name);
-        }
-
         public void DeletePost(TcpClient tcpClient, string option, string postName)
         {
             var newPost = new Post 

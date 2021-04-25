@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Threading;
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Server.Logic;
-using System.Text;
 
 namespace SistemaBlueddit.Server
 {
@@ -17,6 +16,8 @@ namespace SistemaBlueddit.Server
         public static TopicLogic topicLogic = new TopicLogic();
         public static PostLogic postLogic = new PostLogic();
         public static FileLogic fileLogic = new FileLogic();
+        public static LocalRequestHandler localRequestHandler = new LocalRequestHandler(userLogic, topicLogic, postLogic);
+        public static ClientRequestHandler clientRequestHandler = new ClientRequestHandler(topicLogic, postLogic, fileLogic);
 
         static void Main(string[] args)
         {
@@ -29,127 +30,9 @@ namespace SistemaBlueddit.Server
 
             while (!_exit)
             {
-                Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
-                Console.WriteLine("0  - Cargar datos de prueba (si ya estan cargados se sobrescriben)");
-                Console.WriteLine("1  - Listar clientes conectados");
-                Console.WriteLine("2  - Listar todos los temas del sistema");
-                Console.WriteLine("3  - Listar posts por tema");
-                Console.WriteLine("4  - Listar posts por orden de creado");
-                Console.WriteLine("5  - Listar posts por orden de creado y tema");
-                Console.WriteLine("6  - Listar posts por tema y orden de creado");
-                Console.WriteLine("7  - Mostrar un post especifico");
-                Console.WriteLine("8  - Mostrar un tema o temas con mas publicaciones");
-                Console.WriteLine("9  - Mostrar archivo asociado a un post");
-                Console.WriteLine("10 - Mostrar listado de archivos");
-                Console.WriteLine("99 - salir");
-                var option = Console.ReadLine();
-                switch (option)
-                {
-                    case "0":
-                        var mockedTopics = LoadMockData.LoadTopicsMockData();
-                        var mockedPosts = LoadMockData.LoadPostsMockData(mockedTopics);
-                        topicLogic.ClearTopics();
-                        postLogic.ClearPosts();
-                        topicLogic.AddTopics(mockedTopics);
-                        postLogic.AddPosts(mockedPosts);
-                        break;
-                    case "1":
-                        userLogic.ShowUsers();
-                        break;
-                    case "2":
-                        topicLogic.ShowTopics();
-                        break;
-                    case "3":
-                        postLogic.ShowPostsByTopic();
-                        break;
-                    case "4":
-                        postLogic.ShowPostsByDate();
-                        break;
-                    case "5":
-                        postLogic.ShowPostsByDateAndTopic();
-                        break;
-                    case "6":
-                        postLogic.ShowPostsByTopicAndDate();
-                        break;
-                    case "7":
-                        Console.WriteLine("Nombre del post a mostrar:");
-                        var postName = Console.ReadLine();
-                        postLogic.ShowPostByName(postName);
-                        break;
-                    case "8":
-                        var topics = topicLogic.Topics();
-                        postLogic.ShowTopicsWithMorePosts(topics);
-                        break;
-                    case "9":
-                        Console.WriteLine("Nombre del post del cual se desea obtener el archivo:");
-                        var post = Console.ReadLine();
-                        var file = postLogic.GetFileFromPostName(post);
-                        if(file != null)
-                        {
-                            Console.WriteLine(file.PrintFile(false));
-                        }
-                        else
-                        {
-                            Console.WriteLine("El post no existe o no tiene archivos");
-                        }
-                        
-                        break;
-                    case "10":
-                        Console.WriteLine("Desea filtar por tema? (s para confirmar)");
-                        var confirm = Console.ReadLine();
-                        var topicFiltrer = new List<Topic>();
-                        if(confirm.Equals("s"))
-                        {
-                            Console.WriteLine("Elija los nombres de los temas a filtrar: (s para salir)");
-                            var exitFilter = false;
-                            while(!exitFilter)
-                            {
-                                Console.WriteLine("Nombre del tema:");
-                                var topicName = Console.ReadLine();
-                                if(!topicName.Equals("s")){
-                                    var topic = topicLogic.GetTopicByName(topicName);
-                                    if(topic == null){
-                                        Console.WriteLine("El tema no existe");
-                                    }else
-                                    {
-                                        topicFiltrer.Add(topic);
-                                    }
-                                }else
-                                    exitFilter = true;
-                            }
-                        }
-                        Console.WriteLine("Mostrar por:");
-                        Console.WriteLine("1 - Fecha");
-                        Console.WriteLine("2 - Nombre");
-                        Console.WriteLine("3 - Tamaño");
-                        var filterOption = Console.ReadLine();
-                        switch (filterOption)
-                        {
-                            case "1":
-                                postLogic.ShowFilesByTopicsOrderByDate(topicFiltrer);
-                                break;
-                            case "2":
-                                postLogic.ShowFilesByTopicsOrderByName(topicFiltrer);
-                                break;
-                            case "3":
-                                postLogic.ShowFilesByTopicsOrderBySize(topicFiltrer);
-                                break;
-                            default:
-                                Console.WriteLine("Opcion invalida...");
-                            break;
-                        }
-                        break;
-                    case "99":
-                        _exit = true;
-                        tcpListener.Stop();
-                        userLogic.CloseAll();
-                        break;
-                    default:
-                        Console.WriteLine("Opcion invalida...");
-                        break;
-                }
+                _exit = localRequestHandler.HandleLocalRequests();
             }
-            
+            tcpListener.Stop();
         }
 
         private static void ListenForConnections(TcpListener tcpListener)
@@ -164,8 +47,7 @@ namespace SistemaBlueddit.Server
                         StartConnection = DateTime.Now,
                         TcpClient = acceptedClient
                     };
-                    userLogic.AddUser(user);
-                    Console.WriteLine("Acepte una nueva conexion");
+                    userLogic.Add(user);
                     var threadClient = new Thread(() => HandleClient(user));
                     threadClient.Start();
 
@@ -190,108 +72,16 @@ namespace SistemaBlueddit.Server
             {
                 while (!_exit)
                 {
-                    var networkStream = acceptedClient.GetStream();
-                    var header = HeaderHandler.DecodeHeader(networkStream);
-                    HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
-                    var serverResponse = "";
-                    Post existingPost;
-                    switch (header.Command)
-                    {
-                        case 01:
-                            var topic = topicLogic.RecieveTopic(header, networkStream);
-                            Console.WriteLine(topic.PrintTopic());
-                            topicLogic.AddTopic(topic);
-                            serverResponse = "El tema se ha creado con exito";
-                            DataHandler.SendResponse(acceptedClient, serverResponse);
-                            break;
-                        case 02:
-                            var post = postLogic.RecievePost(header, networkStream);
-                            postLogic.ValidatePost(post);
-                            topicLogic.ValidateTopics(post.Topics);
-                            Console.WriteLine("Nombre de la publicacion: " + post.Name);
-                            foreach (var postTopic in post.Topics)
-                            {
-                                Console.WriteLine(postTopic.PrintTopic());
-                            }
-                            postLogic.AddPost(post);
-                            serverResponse = "El post se ha creado con exito";
-                            DataHandler.SendResponse(acceptedClient, serverResponse);
-                            break;
-                        case 03:
-                            existingPost = postLogic.GetPostByName(header, networkStream);
-                            if (existingPost != null)
-                            {
-                                DataHandler.SendResponse(acceptedClient, "existe");
-                                header = HeaderHandler.DecodeHeader(networkStream);
-                                HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
-                                var bluedditFile = fileLogic.GetFile(header, networkStream);
-                                Console.WriteLine(bluedditFile.FileName);
-                                postLogic.AddFileToPost(bluedditFile, existingPost);
-                                serverResponse = "El archivo se ha agregado al post con exito";
-                                DataHandler.SendResponse(acceptedClient, serverResponse);
-                            }
-                            else
-                            {
-                                DataHandler.SendResponse(acceptedClient, "noexiste");
-                            }
-                            break;
-                        case 04:
-                            var topicToRemove = topicLogic.RecieveTopic(header, networkStream);
-                            var existingTopic = topicLogic.GetTopicByName(topicToRemove.Name);
-                            if (existingTopic != null)
-                            {
-                                if (postLogic.IsTopicInPost(existingTopic))
-                                {
-                                    DataHandler.SendResponse(acceptedClient, "Error. No se puede borrar el tema porque esta asociado a un post.");
-                                }
-                                else
-                                {
-                                    topicLogic.DeleteTopic(existingTopic);
-                                    DataHandler.SendResponse(acceptedClient, "El tema ingresado se ha borrado con exito.");
-                                }
-                            }
-                            else
-                            {
-                                DataHandler.SendResponse(acceptedClient, "No existe el tema con el nombre ingresado.");
-                            }
-                            break;
-                        case 05:
-                            var topicToModify = topicLogic.RecieveTopic(header, networkStream);
-                            var topicResponse = topicLogic.ModifyTopic(topicToModify);
-                            DataHandler.SendResponse(acceptedClient, topicResponse);
-                            break;
-                        case 06:
-                            var postToRemove = postLogic.RecievePost(header, networkStream);
-                            var existingPostToRemove = postLogic.GetPostByName(postToRemove.Name);
-                            if (existingPostToRemove != null)
-                            {
-                                postLogic.DeletePost(existingPostToRemove);
-                                DataHandler.SendResponse(acceptedClient, "El post ingresado se ha borrado con exito.");
-                            }
-                            else
-                            {
-                                DataHandler.SendResponse(acceptedClient, "No existe el post con el nombre ingresado.");
-                            }
-                            break;
-                        case 07:
-                            var postToModify = postLogic.RecievePost(header, networkStream);
-                            topicLogic.ValidateTopics(postToModify.Topics);
-                            var postResponse = postLogic.ModifyPost(postToModify);
-                            DataHandler.SendResponse(acceptedClient, postResponse);
-                            break;
-                        default:
-                            Console.WriteLine("Opcion invalida...");
-                            break;
-                    }
+                    clientRequestHandler.HandleClientRequests(acceptedClient);
                 }
                 Console.WriteLine("Sali del while...");
             }
             catch (Exception e)
             {
                 Console.WriteLine("Borrando el cliente. " + e.Message);
-                userLogic.RemoveUser(user);
+                userLogic.Delete(user);
             }
-            Console.WriteLine("El cliente con hora de conexion "+ user.StartConnection.ToString()+" se desconecto");
+            Console.WriteLine("El cliente con hora de conexion " + user.StartConnection.ToString() + " se desconecto");
         }
     }
 }

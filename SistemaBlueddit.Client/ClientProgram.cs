@@ -5,7 +5,6 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 
 namespace SistemaBlueddit.Client
 {
@@ -57,9 +56,7 @@ namespace SistemaBlueddit.Client
                             Console.WriteLine(response.ServerResponse);
                             break;
                         case "3":
-                            Console.WriteLine("Escriba el nombre de la publicacion");
-                            var name = Console.ReadLine();
-                            postLogic.ExistsPost(tcpClient, option, name);
+                            postLogic.SendPost(tcpClient, option);
                             response = HandleResponse(tcpClient);
                             if (response.ServerResponse.Equals("existe"))
                             {

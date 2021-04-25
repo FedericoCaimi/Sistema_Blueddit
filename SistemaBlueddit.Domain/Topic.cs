@@ -9,7 +9,7 @@ namespace SistemaBlueddit.Domain
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public string PrintTopic()
+        public string Print()
         {
             return $"Nombre Tema: {Name}\nDescripcion del Tema: {Description}";
         }

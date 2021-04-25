@@ -7,5 +7,7 @@ namespace SistemaBlueddit.Domain.Interface
         public string SerializeObejct();
 
         public T DeserializeObject(string objectToDeserialize);
+
+        public string Print();
     }
 }

@@ -18,6 +18,11 @@ namespace SistemaBlueddit.Domain
             return this;
         }
 
+        public string Print()
+        {
+            throw new NotImplementedException();
+        }
+
         public string SerializeObejct()
         {
             return $"{{response:{ServerResponse}}}";

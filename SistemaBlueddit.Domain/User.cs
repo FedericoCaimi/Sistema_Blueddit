@@ -21,7 +21,7 @@ namespace SistemaBlueddit.Domain
             throw new NotImplementedException();
         }
 
-        public string PrintUser()
+        public string Print()
         {
             var userAddress = ((IPEndPoint)(TcpClient.Client.RemoteEndPoint)).Address.ToString();
             var userPort = ((IPEndPoint)(TcpClient.Client.RemoteEndPoint)).Port.ToString();

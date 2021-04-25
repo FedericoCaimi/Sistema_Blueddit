@@ -8,11 +8,6 @@ namespace SistemaBlueddit.Server.Logic
 {
     public class FileLogic
     {
-
-        public FileLogic()
-        {
-        }
-
         public BluedditFile GetFile(Header header, NetworkStream networkStream)
         {
             var fileHandler = new FileHandler();
@@ -54,6 +49,7 @@ namespace SistemaBlueddit.Server.Logic
                 CreationDate = DateTime.Now
             };
         }
+
         private byte[] Read(int length, NetworkStream stream)
         {
             int dataReceived = 0;
