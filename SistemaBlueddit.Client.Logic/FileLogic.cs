@@ -9,10 +9,6 @@ namespace SistemaBlueddit.Client.Logic
 {
     public class FileLogic
     {
-        public FileLogic()
-        {
-            
-        }
         public void SendFile(string option, string path, TcpClient connectedClient)
         {
             var fileHandler = new FileHandler();
@@ -25,8 +21,6 @@ namespace SistemaBlueddit.Client.Logic
             var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, fileSize, fileNameLength);
             var connectionStream = connectedClient.GetStream();
             
-            Console.WriteLine($"FileName is: {fileName}, file size is: {fileSize}");
-
             if (fileSize < Constants.MaxFileSize)
             {
                 connectionStream.Write(header);
@@ -40,7 +34,6 @@ namespace SistemaBlueddit.Client.Logic
 
                 while (fileSize > offset)
                 {
-                    Console.WriteLine($"Voy a enviar parte {currentPart} de {parts}");
                     if (currentPart == parts)
                     {
                         var lastPartSize = fileSize - offset;
@@ -61,7 +54,7 @@ namespace SistemaBlueddit.Client.Logic
             }
             else
             {
-                Console.WriteLine("Archivo demasiado grande para ser enviado");
+                throw new Exception("Archivo demasiado grande para ser enviado");
             }
         }
     }

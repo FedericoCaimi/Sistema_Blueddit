@@ -2,9 +2,7 @@
 using SistemaBlueddit.Protocol.Library;
 using SistemaBlueddit.Server.Logic;
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SistemaBlueddit.Server
 {
@@ -36,11 +34,13 @@ namespace SistemaBlueddit.Server
                     if (_topicLogic.Validate(topicRecieved))
                     {
                         _topicLogic.Add(topicRecieved);
-                        DataHandler.SendResponse(acceptedClient, "El tema se ha creado con exito");
+                        var topicCreatedSuccess = new Response { ServerResponse = "El tema se ha creado con exito" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", topicCreatedSuccess);
                     }
                     else
                     {
-                        DataHandler.SendResponse(acceptedClient, "Error. El tema ya existe");
+                        var topicCreatedError = new Response { ServerResponse = "Error. El tema ya existe" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", topicCreatedError);
                     }
                     break;
                 case 02:
@@ -49,11 +49,13 @@ namespace SistemaBlueddit.Server
                     if (_postLogic.Validate(postRecieved) && _topicLogic.ValidateTopics(postRecieved.Topics))
                     {
                         _postLogic.Add(postRecieved);
-                        DataHandler.SendResponse(acceptedClient, "El post se ha creado con exito");
+                        var postCreatedSuccess = new Response { ServerResponse = "El post se ha creado con exito" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", postCreatedSuccess);
                     }
                     else
                     {
-                        DataHandler.SendResponse(acceptedClient, "Error. El post ya existe o los temas no son validos");
+                        var postCreatedError = new Response { ServerResponse = "Error. El post ya existe o los temas no son validos" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", postCreatedError);
                     }
                     break;
                 case 03:
@@ -62,17 +64,20 @@ namespace SistemaBlueddit.Server
                     var existingPost = _postLogic.GetByName(postToAddFile.Name);
                     if (existingPost != null)
                     {
-                        DataHandler.SendResponse(acceptedClient, "existe");
+                        var existsPost = new Response { ServerResponse = "Error. El post ya existe o los temas no son validos" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", existsPost);
                         header = HeaderHandler.DecodeHeader(networkStream);
                         HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
                         var bluedditFile = _fileLogic.GetFile(header, networkStream);
                         Console.WriteLine(bluedditFile.FileName);
                         _postLogic.AddFileToPost(bluedditFile, existingPost);
-                        DataHandler.SendResponse(acceptedClient, "El archivo se ha agregado al post con exito");
+                        var fileAddedSuccess = new Response { ServerResponse = "El archivo se ha agregado al post con exito" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", fileAddedSuccess);
                     }
                     else
                     {
-                        DataHandler.SendResponse(acceptedClient, "noexiste");
+                        var notExistsPost = new Response { ServerResponse = "noexiste" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", notExistsPost);
                     }
                     break;
                 case 04:
@@ -83,24 +88,28 @@ namespace SistemaBlueddit.Server
                     {
                         if (_postLogic.IsTopicInPost(existingTopic))
                         {
-                            DataHandler.SendResponse(acceptedClient, "Error. No se puede borrar el tema porque esta asociado a un post.");
+                            var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
+                            DataHandler<Response>.SendData(acceptedClient, "00", topicDeleteError);
                         }
                         else
                         {
                             _topicLogic.Delete(existingTopic);
-                            DataHandler.SendResponse(acceptedClient, "El tema ingresado se ha borrado con exito.");
+                            var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
+                            DataHandler<Response>.SendData(acceptedClient, "00", topicDeleteSuccess);
                         }
                     }
                     else
                     {
-                        DataHandler.SendResponse(acceptedClient, "No existe el tema con el nombre ingresado.");
+                        var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
+                        DataHandler<Response>.SendData(acceptedClient, "00", topicDoesntExist);
                     }
                     break;
                 case 05:
                     var topicToModify = new Topic();
                     _topicLogic.Recieve(header, networkStream, topicToModify);
                     var topicResponse = _topicLogic.ModifyTopic(topicToModify);
-                    DataHandler.SendResponse(acceptedClient, topicResponse);
+                    var topicModifiedResponse = new Response { ServerResponse = topicResponse };
+                    DataHandler<Response>.SendData(acceptedClient, "00", topicModifiedResponse);
                     break;
                 case 06:
                     var postToRemove = new Post();
@@ -109,11 +118,13 @@ namespace SistemaBlueddit.Server
                     if (existingPostToRemove != null)
                     {
                         _postLogic.Delete(existingPostToRemove);
-                        DataHandler.SendResponse(acceptedClient, "El post ingresado se ha borrado con exito.");
+                        var deletedPostSuccess = new Response { ServerResponse = "El post ingresado se ha borrado con exito." };
+                        DataHandler<Response>.SendData(acceptedClient, "00", deletedPostSuccess);
                     }
                     else
                     {
-                        DataHandler.SendResponse(acceptedClient, "No existe el post con el nombre ingresado.");
+                        var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
+                        DataHandler<Response>.SendData(acceptedClient, "00", postDeleteError);
                     }
                     break;
                 case 07:
@@ -122,11 +133,13 @@ namespace SistemaBlueddit.Server
                     if (_topicLogic.ValidateTopics(postToModify.Topics))
                     {
                         var postResponse = _postLogic.ModifyPost(postToModify);
-                        DataHandler.SendResponse(acceptedClient, postResponse);
+                        var modifyPostResponse = new Response { ServerResponse = postResponse };
+                        DataHandler<Response>.SendData(acceptedClient, "00", modifyPostResponse);
                     }
                     else
                     {
-                        DataHandler.SendResponse(acceptedClient, "Error. Los temas ingresados no son validos");
+                        var modifyPostResponseTopicError = new Response { ServerResponse = "Error. Los temas ingresados no son validos" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", modifyPostResponseTopicError);
                     }
                     break;
                 default:

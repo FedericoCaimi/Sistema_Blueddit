@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SistemaBlueddit.Client.Logic.Interfaces\SistemaBlueddit.Client.Logic.Interfaces.csproj" />
     <ProjectReference Include="..\SistemaBlueddit.Protocol.Library\SistemaBlueddit.Protocol.Library.csproj" />
   </ItemGroup>
 

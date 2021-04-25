@@ -1,25 +1,21 @@
-﻿using SistemaBlueddit.Domain;
+﻿using SistemaBlueddit.Domain.Interface;
+using System;
 using System.Net.Sockets;
 using System.Text;
 
 namespace SistemaBlueddit.Protocol.Library
 {
-    public static class DataHandler
+    public static class DataHandler<T> where T : ISerializable<T>
     {
-        public static void SendData(TcpClient connectedClient, string data)
+        public static void SendData(TcpClient connectedClient, string option, T objectToSend)
         {
+            var objectSerialized = objectToSend.SerializeObejct();
+            var objectLength = objectSerialized.Length;
+            var command = Convert.ToInt16(option);
+            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, objectLength, 0);
             var connectionStream = connectedClient.GetStream();
-            connectionStream.Write(Encoding.UTF8.GetBytes(data));
-        }
-
-        public static void SendResponse(TcpClient client, string serverResponse)
-        {
-            var stream = client.GetStream();
-            var response = new Response { ServerResponse = serverResponse };
-            var responseSerialized = response.SerializeObejct();
-            var encodedHeader = HeaderHandler.EncodeHeader(HeaderConstants.Response, 00, responseSerialized.Length, 0);
-            stream.Write(encodedHeader);
-            SendData(client, responseSerialized);
+            connectionStream.Write(header);
+            connectionStream.Write(Encoding.UTF8.GetBytes(objectSerialized));
         }
     }
 }
