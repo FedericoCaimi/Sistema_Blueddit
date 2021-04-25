@@ -1,4 +1,5 @@
-﻿using SistemaBlueddit.Domain;
+﻿using System.Threading;
+using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
 using SistemaBlueddit.Server.Logic;
 using System;
@@ -83,18 +84,24 @@ namespace SistemaBlueddit.Server
                     var topicToRemove = new Topic();
                     _topicLogic.Recieve(header, networkStream, topicToRemove);
                     var existingTopic = _topicLogic.GetByName(topicToRemove.Name);
+                    
                     if (existingTopic != null)
                     {
-                        if (_postLogic.IsTopicInPost(existingTopic))
-                        {
-                            var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
-                            DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteError);
-                        }
-                        else
-                        {
-                            _topicLogic.Delete(existingTopic);
-                            var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
-                            DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteSuccess);
+                        lock(existingTopic){
+                            if (_postLogic.IsTopicInPost(existingTopic))
+                            {
+                                var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
+                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteError);
+                            }
+                            else
+                            {
+                                Console.WriteLine("borrando...");
+                                Thread.Sleep(10000);
+                                _topicLogic.Delete(existingTopic);
+                                Console.WriteLine("borrado!!");
+                                var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
+                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteSuccess);
+                            }
                         }
                     }
                     else
@@ -102,6 +109,7 @@ namespace SistemaBlueddit.Server
                         var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
                         DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDoesntExist);
                     }
+                    
                     break;
                 case 05:
                     var topicToModify = new Topic();
