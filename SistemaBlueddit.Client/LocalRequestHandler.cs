@@ -64,7 +64,7 @@ namespace SistemaBlueddit.Client
                             Console.WriteLine(createPostResponse.ServerResponse);
                             break;
                         case "3":
-                            Console.WriteLine("Escriba el nombre del post a actualizar");
+                            Console.WriteLine("Escriba el nombre del la publicacion");
                             var postName = Console.ReadLine();
                             var postToUploadFile = new Post
                             {
@@ -78,6 +78,8 @@ namespace SistemaBlueddit.Client
                                 Console.WriteLine("Escriba el path completo del archivo a subir");
                                 var path = Console.ReadLine();
                                 _fileLogic.SendFile(option, path, tcpClient);
+                                var fileSendConfirmation = _responseLogic.HandleResponse(tcpClient);
+                                Console.WriteLine(fileSendConfirmation.ServerResponse);
                             }
                             else
                             {
@@ -132,7 +134,7 @@ namespace SistemaBlueddit.Client
             }
             catch (Exception e)
             {
-                Console.WriteLine("Ha habido un error: " + e.Message);
+                Console.WriteLine("Ha habido un error: " + e.Message+" "+e.ToString());
                 Console.WriteLine("Se perdió la conexión con el servidor.");
             }
         }

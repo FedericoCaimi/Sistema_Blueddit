@@ -10,22 +10,22 @@ namespace SistemaBlueddit.Client.Logic
     {
         public void Create(TcpClient connectedClient, string option, T objectToSend)
         {
-            DataHandler<T>.SendData(connectedClient, option, objectToSend);
+            DataHandler<T>.SendData(connectedClient, option, HeaderConstants.Request, objectToSend);
         }
 
         public void Update(TcpClient connectedClient, string option, T objectToSend)
         {
-            DataHandler<T>.SendData(connectedClient, option, objectToSend);
+            DataHandler<T>.SendData(connectedClient, option, HeaderConstants.Request, objectToSend);
         }
 
         public void Exists(TcpClient connectedClient, string option, T objectToSend)
         {
-            DataHandler<T>.SendData(connectedClient, option, objectToSend);
+            DataHandler<T>.SendData(connectedClient, option, HeaderConstants.Request, objectToSend);
         }
 
         public void Delete(TcpClient connectedClient, string option, T objectToSend)
         {
-            DataHandler<T>.SendData(connectedClient, option, objectToSend);
+            DataHandler<T>.SendData(connectedClient, option, HeaderConstants.Request, objectToSend);
         }
     }
 }
