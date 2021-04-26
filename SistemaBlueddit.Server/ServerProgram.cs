@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Server.Logic;
 
@@ -16,11 +19,18 @@ namespace SistemaBlueddit.Server
         public static FileLogic fileLogic = new FileLogic();
         public static LocalRequestHandler localRequestHandler = new LocalRequestHandler(userLogic, topicLogic, postLogic);
         public static ClientRequestHandler clientRequestHandler = new ClientRequestHandler(topicLogic, postLogic, fileLogic);
+        public static IConfigurationRoot configuration;
 
         static void Main(string[] args)
         {
             Console.WriteLine("Server esta iniciando...");
-            var tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 50000);
+
+            ConfigureServices();
+
+            var serverIP = configuration.GetSection("serverIP").Value;
+            var port = Convert.ToInt32(configuration.GetSection("port").Value);
+
+            var tcpListener = new TcpListener(IPAddress.Parse(serverIP), port);
             tcpListener.Start(10);
 
             var threadServer = new Thread(()=> ListenForConnections(tcpListener));
@@ -60,7 +70,6 @@ namespace SistemaBlueddit.Server
                     Console.WriteLine(e.Message);
                 }
             }
-            Console.WriteLine("Saliendo del listen...");
         }
 
         private static void HandleClient(User user)
@@ -72,7 +81,6 @@ namespace SistemaBlueddit.Server
                 {
                     clientRequestHandler.HandleClientRequests(acceptedClient);
                 }
-                Console.WriteLine("Sali del while...");
             }
             catch (Exception e)
             {
@@ -80,6 +88,15 @@ namespace SistemaBlueddit.Server
                 userLogic.Delete(user);
             }
             Console.WriteLine("El cliente con hora de conexion " + user.StartConnection.ToString() + " se desconecto");
+        }
+
+        private static void ConfigureServices()
+        {
+            // Build configuration
+            configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                .AddJsonFile("appsettings.json", false)
+                .Build();
         }
     }
 }
