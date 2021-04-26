@@ -146,6 +146,8 @@ namespace SistemaBlueddit.Client
             var postTopics = new List<Topic>();
             Console.WriteLine("Nombre del post:");
             var name = Console.ReadLine();
+            Console.WriteLine("Contenido del post:");
+            var content = Console.ReadLine();
             Console.WriteLine("Agregar temas. Cuando termine de agregar temas ingrese la letra s:");
             while (!exit)
             {
@@ -172,6 +174,7 @@ namespace SistemaBlueddit.Client
                 }
             };
             newPost.Name = name;
+            newPost.Content = content;
             newPost.Topics = postTopics;
             newPost.CreationDate = DateTime.Now;
             return newPost;

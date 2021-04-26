@@ -36,18 +36,21 @@ namespace SistemaBlueddit.Server
             var post1 = new Post
             {
                 Name = "post1",
+                Content = "contentPost1",
                 Topics = new List<Topic> { mockedTopicsData[2] },
                 CreationDate = DateTime.Now
             };
             var post2 = new Post
             {
                 Name = "post2",
+                Content = "contentPost2",
                 Topics = new List<Topic> { mockedTopicsData[0] },
                 CreationDate = DateTime.Now.AddSeconds(1)
             };
             var post3 = new Post
             {
                 Name = "post3",
+                Content = "contentPost3",
                 Topics = new List<Topic> { mockedTopicsData[1] },
                 CreationDate = DateTime.Now.AddSeconds(2)
             };

@@ -83,24 +83,30 @@ namespace SistemaBlueddit.Server
                 case 04:
                     var topicToRemove = new Topic();
                     _topicLogic.Recieve(header, networkStream, topicToRemove);
-                    var existingTopic = _topicLogic.GetByName(topicToRemove.Name);
-                    
-                    if (existingTopic != null)
+                    var topicToRemoveLock = _topicLogic.GetByName(topicToRemove.Name);
+                    if(topicToRemoveLock != null)
                     {
-                        lock(existingTopic){
-                            if (_postLogic.IsTopicInPost(existingTopic))
+                        lock (topicToRemoveLock)
+                        {
+                            var existingTopic = _topicLogic.GetByName(topicToRemove.Name);
+                            if (existingTopic != null)
                             {
-                                var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
-                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteError);
+                                if (_postLogic.IsTopicInPost(existingTopic))
+                                {
+                                    var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
+                                    DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteError);
+                                }
+                                else
+                                {
+                                    _topicLogic.Delete(existingTopic);
+                                    var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
+                                    DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteSuccess);
+                                }
                             }
                             else
                             {
-                                Console.WriteLine("borrando...");
-                                Thread.Sleep(10000);
-                                _topicLogic.Delete(existingTopic);
-                                Console.WriteLine("borrado!!");
-                                var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
-                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDeleteSuccess);
+                                var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
+                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDoesntExist);
                             }
                         }
                     }
@@ -109,39 +115,74 @@ namespace SistemaBlueddit.Server
                         var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
                         DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicDoesntExist);
                     }
-                    
                     break;
                 case 05:
                     var topicToModify = new Topic();
                     _topicLogic.Recieve(header, networkStream, topicToModify);
-                    var topicResponse = _topicLogic.ModifyTopic(topicToModify);
-                    var topicModifiedResponse = new Response { ServerResponse = topicResponse };
-                    DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicModifiedResponse);
+                    var topicToModifyLock = _topicLogic.GetByName(topicToModify.Name);
+                    if(topicToModifyLock != null)
+                    {
+                        lock (topicToModifyLock)
+                        {
+                            var topicResponse = _topicLogic.ModifyTopic(topicToModify);
+                            var topicModifiedResponse = new Response { ServerResponse = topicResponse };
+                            DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicModifiedResponse);
+                        }
+                    }
+                    else
+                    {
+                        var topicModifiedErrorResponse = new Response { ServerResponse = "El tema no existe" };
+                        DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, topicModifiedErrorResponse);
+                    }
                     break;
                 case 06:
                     var postToRemove = new Post();
                     _postLogic.Recieve(header, networkStream, postToRemove);
-                    var existingPostToRemove = _postLogic.GetByName(postToRemove.Name);
-                    if (existingPostToRemove != null)
+                    var postToRemoveLock = _postLogic.GetByName(postToRemove.Name);
+                    if(postToRemoveLock != null)
                     {
-                        _postLogic.Delete(existingPostToRemove);
-                        var deletedPostSuccess = new Response { ServerResponse = "El post ingresado se ha borrado con exito." };
-                        DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, deletedPostSuccess);
+                        lock (postToRemoveLock)
+                        {
+                            var existingPostToRemove = _postLogic.GetByName(postToRemove.Name);
+                            if(existingPostToRemove != null)
+                            {
+                                _postLogic.Delete(existingPostToRemove);
+                                var deletedPostSuccess = new Response { ServerResponse = "El post ingresado se ha borrado con exito." };
+                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, deletedPostSuccess);
+                            }
+                            else
+                            {
+                                var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
+                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, postDeleteError);
+                            };
+                        }
                     }
                     else
                     {
                         var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
                         DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, postDeleteError);
-                    }
+                    };
                     break;
                 case 07:
                     var postToModify = new Post();
                     _postLogic.Recieve(header, networkStream, postToModify);
                     if (_topicLogic.ValidateTopics(postToModify.Topics))
                     {
-                        var postResponse = _postLogic.ModifyPost(postToModify);
-                        var modifyPostResponse = new Response { ServerResponse = postResponse };
-                        DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, modifyPostResponse);
+                        var modifyPostLock = _postLogic.GetByName(postToModify.Name);
+                        if(modifyPostLock != null)
+                        {
+                            lock (modifyPostLock)
+                            {
+                                var postResponse = _postLogic.ModifyPost(postToModify);
+                                var modifyPostResponse = new Response { ServerResponse = postResponse };
+                                DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, modifyPostResponse);
+                            }
+                        }
+                        else
+                        {
+                            var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
+                            DataHandler<Response>.SendData(acceptedClient, "00", HeaderConstants.Response, postDeleteError);
+                        }
                     }
                     else
                     {

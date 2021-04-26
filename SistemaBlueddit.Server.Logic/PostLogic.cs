@@ -171,10 +171,18 @@ namespace SistemaBlueddit.Server.Logic
 
         public string ModifyPost(Post postToModify)
         {
-            var existingPost = _elements.FirstOrDefault(p => p.Name == postToModify.Name);
-            existingPost.Name = postToModify.Name;
-            existingPost.Topics = postToModify.Topics;
-            return "Post modificado con exito";
+            var existingPost = GetByName(postToModify.Name);
+            if (existingPost != null)
+            {
+                existingPost.Name = postToModify.Name;
+                existingPost.Content = postToModify.Content;
+                existingPost.Topics = postToModify.Topics;
+                return "Post modificado con exito";
+            }
+            else
+            {
+                return "No existe el post con el nombre ingresado.";
+            }
         }
 
         public override Post GetByName(string name)

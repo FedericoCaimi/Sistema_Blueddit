@@ -9,6 +9,8 @@ namespace SistemaBlueddit.Domain
     {
         public string Name { get; set; }
 
+        public string Content { get; set; }
+
         public List<Topic> Topics { get; set; }
 
         public DateTime CreationDate { get; set; }
@@ -25,7 +27,7 @@ namespace SistemaBlueddit.Domain
             serializedTopics = !serializedTopics.Equals("") 
                 ? serializedTopics.Remove(serializedTopics.Length - 1) 
                 : serializedTopics;
-            return $"{{name:{Name},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd HH:mm:ss}'}}";
+            return $"{{name:{Name},Content:{Content},topics:[{serializedTopics}],creationDate:'{CreationDate:yyyy-MM-dd HH:mm:ss}'}}";
         }
 
         public Post DeserializeObject(string objectToDeserialize)
@@ -44,6 +46,9 @@ namespace SistemaBlueddit.Domain
                 {
                     case ("name"):
                         Name = propertyValue;
+                        break;
+                    case ("Content"):
+                        Content = propertyValue;
                         break;
                     case ("topics"):
                         var topics = new List<Topic>();
@@ -79,7 +84,7 @@ namespace SistemaBlueddit.Domain
                 topicsPrinted += $"\tTopic Name: {topic.Name}\n";
             }
             var filePrinted = File != null ? "\nFile:\n" + File.PrintFile(true) : "";
-            return $"Name: {Name}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd HH:mm:ss}'{filePrinted}";
+            return $"Name: {Name}\nContent: {Content}\n{topicsPrinted}CreationDate: '{CreationDate:yyyy-MM-dd HH:mm:ss}'{filePrinted}";
         }
 
         public override bool Equals(object obj)
