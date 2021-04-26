@@ -67,6 +67,8 @@ namespace SistemaBlueddit.Server.Logic
             {
                 objectsPrinted += objectToPrint.Print() + "\n";
             }
+            if(objectsPrinted == "")
+                return "No se encontraron datos para la opcion seleccionada...";
             return objectsPrinted;
         }
 

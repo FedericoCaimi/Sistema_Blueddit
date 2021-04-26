@@ -5,7 +5,7 @@ namespace SistemaBlueddit.Protocol.Library
 {
     public class FileHandler
     {
-        public bool FileExists(string path)
+        private bool FileExists(string path)
         {
             return File.Exists(path);
         }
@@ -17,7 +17,7 @@ namespace SistemaBlueddit.Protocol.Library
                 return new FileInfo(path).Name;
             }
 
-            throw new Exception("File no existe!");
+            throw new Exception("El archivo seleccionado no Existe.");
         }
 
         public long GetFileSize(string path)
@@ -27,7 +27,7 @@ namespace SistemaBlueddit.Protocol.Library
                 return new FileInfo(path).Length;
             }
 
-            throw new Exception("File no existe!");
+            throw new Exception("El archivo seleccionado no Existe.");
         }
     
         public byte[] ReadFile(string path)

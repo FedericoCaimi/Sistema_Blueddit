@@ -9,6 +9,8 @@ namespace SistemaBlueddit.Server.Logic
         public bool ValidateTopics(List<Topic> topics)
         {
             var areTopicsValid = true;
+            if(topics.Count == 0)
+                return false;
             foreach(var topic in topics)
             {
                 if (!_elements.Exists(t => t.Equals(topic)))

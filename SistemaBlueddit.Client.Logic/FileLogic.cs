@@ -14,13 +14,13 @@ namespace SistemaBlueddit.Client.Logic
             var fileSize = fileHandler.GetFileSize(path);
             var fileName = fileHandler.GetFileName(path);
             var fileNameLength = fileName.Length;
-
-            var command = Convert.ToInt16(option);
-            var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, fileSize, fileNameLength);
-            var connectionStream = connectedClient.GetStream();
-            
             if (fileSize < HeaderConstants.MaxFileSize)
             {
+                var command = Convert.ToInt16(option);
+                var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, fileSize, fileNameLength);
+                var connectionStream = connectedClient.GetStream();
+            
+            
                 connectionStream.Write(header);
                 connectionStream.Write(Encoding.UTF8.GetBytes(fileName));
 
@@ -52,7 +52,7 @@ namespace SistemaBlueddit.Client.Logic
             }
             else
             {
-                throw new Exception("Archivo demasiado grande para ser enviado");
+                throw new Exception("Archivo es demasiado grande para ser enviado.");
             }
         }
     }

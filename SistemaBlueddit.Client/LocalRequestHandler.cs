@@ -77,9 +77,13 @@ namespace SistemaBlueddit.Client
                             {
                                 Console.WriteLine("Escriba el path completo del archivo a subir");
                                 var path = Console.ReadLine();
-                                _fileLogic.SendFile(option, path, tcpClient);
-                                var fileSendConfirmation = _responseLogic.HandleResponse(tcpClient);
-                                Console.WriteLine(fileSendConfirmation.ServerResponse);
+                                try{
+                                    _fileLogic.SendFile(option, path, tcpClient);
+                                    var fileSendConfirmation = _responseLogic.HandleResponse(tcpClient);
+                                    Console.WriteLine(fileSendConfirmation.ServerResponse);
+                                }catch(Exception e){
+                                    Console.WriteLine(e.Message);
+                                }
                             }
                             else
                             {
@@ -134,7 +138,7 @@ namespace SistemaBlueddit.Client
             }
             catch (Exception e)
             {
-                Console.WriteLine("Ha habido un error: " + e.Message+" "+e.ToString());
+                Console.WriteLine("Ha habido un error: " + e.Message);
                 Console.WriteLine("Se perdió la conexión con el servidor.");
             }
         }
