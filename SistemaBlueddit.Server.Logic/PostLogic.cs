@@ -1,11 +1,11 @@
 ﻿using SistemaBlueddit.Domain;
-using System;
+using SistemaBlueddit.Server.Logic.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class PostLogic: Logic<Post>
+    public class PostLogic: Logic<Post>, IPostLogic
     {
         public string ShowPostsByTopic(){
             var filteredPosts = new List<Post>();

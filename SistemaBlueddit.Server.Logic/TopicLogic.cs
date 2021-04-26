@@ -1,10 +1,11 @@
 ﻿using SistemaBlueddit.Domain;
+using SistemaBlueddit.Server.Logic.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class TopicLogic: Logic<Topic>
+    public class TopicLogic: Logic<Topic>, ITopicLogic
     {
         public bool ValidateTopics(List<Topic> topics)
         {

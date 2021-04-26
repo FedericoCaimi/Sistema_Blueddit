@@ -1,8 +1,9 @@
 ﻿using SistemaBlueddit.Domain;
+using SistemaBlueddit.Server.Logic.Interfaces;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class UserLogic: Logic<User>
+    public class UserLogic: Logic<User>, IUserLogic
     {
         public void CloseAll()
         {
