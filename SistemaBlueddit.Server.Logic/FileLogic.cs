@@ -1,12 +1,13 @@
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
+using SistemaBlueddit.Server.Logic.Interfaces;
 using System;
 using System.Net.Sockets;
 using System.Text;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class FileLogic
+    public class FileLogic: IFileLogic
     {
         public BluedditFile GetFile(Header header, NetworkStream networkStream)
         {

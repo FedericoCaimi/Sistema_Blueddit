@@ -1,5 +1,5 @@
 ﻿using SistemaBlueddit.Domain;
-using SistemaBlueddit.Server.Logic;
+using SistemaBlueddit.Server.Logic.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -7,20 +7,20 @@ namespace SistemaBlueddit.Server
 {
     public class LocalRequestHandler
     {
-        private UserLogic _userLogic;
+        private IUserLogic _userLogic;
 
-        private TopicLogic _topicLogic;
+        private ITopicLogic _topicLogic;
 
-        private PostLogic _postLogic;
+        private IPostLogic _postLogic;
 
-        public LocalRequestHandler(UserLogic userLogic, TopicLogic topicLogic, PostLogic postLogic)
+        public LocalRequestHandler(IUserLogic userLogic, ITopicLogic topicLogic, IPostLogic postLogic)
         {
             _userLogic = userLogic;
             _topicLogic = topicLogic;
             _postLogic = postLogic;
         }
 
-        public bool HandleLocalRequests()
+        public void HandleLocalRequests(ServerState serverState)
         {
             Console.WriteLine("**********************************************************************");
             Console.WriteLine("*        Bienvenido al Servidor del Sistema Blueddit                 *");
@@ -101,56 +101,14 @@ namespace SistemaBlueddit.Server
                 case "10":
                     if (_postLogic.ExistFilesInPosts())
                     {
-                        Console.WriteLine("Desea filtar por tema? (s para confirmar)");
-                        var confirm = Console.ReadLine();
-                        var topicFilter = new List<Topic>();
-                        if (confirm.Equals("s"))
-                        {
-                            Console.WriteLine("Elija los nombres de los temas a filtrar: (s para salir)");
-                            var exitFilter = false;
-                            while (!exitFilter)
-                            {
-                                Console.WriteLine("Nombre del tema:");
-                                var topicName = Console.ReadLine();
-                                if (!topicName.Equals("s"))
-                                {
-                                    var topic = _topicLogic.GetByName(topicName);
-                                    if (topic == null)
-                                    {
-                                        Console.WriteLine("El tema no existe");
-                                    }
-                                    else
-                                    {
-                                        topicFilter.Add(topic);
-                                    }
-                                }
-                                else
-                                    exitFilter = true;
-                            }
-                        }
+                        var topicFilter = HandleFilterByTopic();
                         Console.WriteLine("Mostrar por:");
                         Console.WriteLine("1 - Fecha");
                         Console.WriteLine("2 - Nombre");
                         Console.WriteLine("3 - Tamaño");
                         var filterOption = Console.ReadLine();
-                        switch (filterOption)
-                        {
-                            case "1":
-                                var postsByTopicsOrderByDate = _postLogic.ShowFilesByTopicsOrderByDate(topicFilter);
-                                Console.WriteLine(postsByTopicsOrderByDate);
-                                break;
-                            case "2":
-                                var postsByTopicsOrderByName = _postLogic.ShowFilesByTopicsOrderByName(topicFilter);
-                                Console.WriteLine(postsByTopicsOrderByName);
-                                break;
-                            case "3":
-                                var postsByTopicsOrderBySize = _postLogic.ShowFilesByTopicsOrderBySize(topicFilter);
-                                Console.WriteLine(postsByTopicsOrderBySize);
-                                break;
-                            default:
-                                Console.WriteLine("Opcion invalida...");
-                                break;
-                        }
+                        var filesToShow = ShowFiles(filterOption, topicFilter);
+                        Console.WriteLine(filesToShow);
                     }
                     else
                     {
@@ -159,12 +117,62 @@ namespace SistemaBlueddit.Server
                     break;
                 case "99":
                     _userLogic.CloseAll();
-                    return true;
+                    serverState.IsServerTerminated = true;
+                    break;
                 default:
                     Console.WriteLine("Opcion invalida...");
                     break;
             }
-            return false;
+        }
+
+        private List<Topic> HandleFilterByTopic()
+        {
+            Console.WriteLine("Desea filtar por tema? (s para confirmar)");
+            var confirm = Console.ReadLine();
+            var topicFilter = new List<Topic>();
+            if (confirm.Equals("s"))
+            {
+                Console.WriteLine("Elija los nombres de los temas a filtrar: (s para salir)");
+                var exitFilter = false;
+                while (!exitFilter)
+                {
+                    Console.WriteLine("Nombre del tema:");
+                    var topicName = Console.ReadLine();
+                    if (!topicName.Equals("s"))
+                    {
+                        var topic = _topicLogic.GetByName(topicName);
+                        if (topic == null)
+                        {
+                            Console.WriteLine("El tema no existe");
+                        }
+                        else
+                        {
+                            topicFilter.Add(topic);
+                        }
+                    }
+                    else
+                        exitFilter = true;
+                }
+            }
+            return topicFilter;
+        }
+
+        private string ShowFiles(string filterOption, List<Topic> topicFilter)
+        {
+            switch (filterOption)
+            {
+                case "1":
+                    var postsByTopicsOrderByDate = _postLogic.ShowFilesByTopicsOrderByDate(topicFilter);
+                    return postsByTopicsOrderByDate;
+                case "2":
+                    var postsByTopicsOrderByName = _postLogic.ShowFilesByTopicsOrderByName(topicFilter);
+                    return postsByTopicsOrderByName;
+                case "3":
+                    var postsByTopicsOrderBySize = _postLogic.ShowFilesByTopicsOrderBySize(topicFilter);
+                    return postsByTopicsOrderBySize;
+                default:
+                    return "Opcion invalida...";
+            }
         }
     }
 }

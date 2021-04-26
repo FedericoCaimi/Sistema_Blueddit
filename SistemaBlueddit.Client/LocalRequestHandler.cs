@@ -1,4 +1,4 @@
-﻿using SistemaBlueddit.Client.Logic;
+﻿using SistemaBlueddit.Client.Logic.Interfaces;
 using SistemaBlueddit.Domain;
 using System;
 using System.Collections.Generic;
@@ -9,13 +9,13 @@ namespace SistemaBlueddit.Client
 {
     public class LocalRequestHandler
     {
-        private TopicLogic _topicLogic;
-        private PostLogic _postLogic;
-        private FileLogic _fileLogic;
-        private ResponseLogic _responseLogic;
+        private ITopicLogic _topicLogic;
+        private IPostLogic _postLogic;
+        private IFileLogic _fileLogic;
+        private IResponseLogic _responseLogic;
         private bool exit;
 
-        public LocalRequestHandler(TopicLogic topicLogic, PostLogic postLogic, FileLogic fileLogic, ResponseLogic responseLogic)
+        public LocalRequestHandler(ITopicLogic topicLogic, IPostLogic postLogic, IFileLogic fileLogic, IResponseLogic responseLogic)
         {
             _topicLogic = topicLogic;
             _postLogic = postLogic;

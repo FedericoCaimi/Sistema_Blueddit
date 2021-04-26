@@ -1,3 +1,4 @@
+using SistemaBlueddit.Client.Logic.Interfaces;
 using SistemaBlueddit.Protocol.Library;
 using System;
 using System.Net.Sockets;
@@ -5,7 +6,7 @@ using System.Text;
 
 namespace SistemaBlueddit.Client.Logic
 {
-    public class FileLogic
+    public class FileLogic: IFileLogic
     {
         public void SendFile(string option, string path, TcpClient connectedClient)
         {

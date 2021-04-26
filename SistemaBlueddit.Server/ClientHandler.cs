@@ -1,27 +1,53 @@
 ﻿using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
-using SistemaBlueddit.Server.Logic;
+using SistemaBlueddit.Server.Logic.Interfaces;
 using System;
 using System.Net.Sockets;
 
 namespace SistemaBlueddit.Server
 {
-    public class ClientRequestHandler
+    public class ClientHandler
     {
-        private TopicLogic _topicLogic;
+        private ITopicLogic _topicLogic;
 
-        private PostLogic _postLogic;
+        private IPostLogic _postLogic;
 
-        private FileLogic _fileLogic;
+        private IFileLogic _fileLogic;
 
-        public ClientRequestHandler(TopicLogic topicLogic, PostLogic postLogic, FileLogic fileLogic)
+        private IUserLogic _userLogic;
+
+        public ClientHandler(ITopicLogic topicLogic, IPostLogic postLogic, IFileLogic fileLogic, IUserLogic userLogic)
         {
             _topicLogic = topicLogic;
             _postLogic = postLogic;
             _fileLogic = fileLogic;
+            _userLogic = userLogic;
         }
 
-        public void HandleClientRequests(TcpClient acceptedClient)
+        public void HandleClient(TcpClient acceptedClient, ServerState serverState)
+        {
+            var user = new User
+            {
+                StartConnection = DateTime.Now,
+                TcpClient = acceptedClient
+            };
+            _userLogic.Add(user);
+            try
+            {
+                while (!serverState.IsServerTerminated)
+                {
+                    HandleRequests(acceptedClient);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Borrando el cliente. " + e.Message);
+                _userLogic.Delete(user);
+            }
+            Console.WriteLine("El cliente con hora de conexion " + user.StartConnection.ToString() + " se desconecto");
+        }
+
+        public void HandleRequests(TcpClient acceptedClient)
         {
             var networkStream = acceptedClient.GetStream();
             var header = HeaderHandler.DecodeHeader(networkStream);

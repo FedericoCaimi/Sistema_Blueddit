@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SistemaBlueddit.Domain.Interface\SistemaBlueddit.Domain.Interface.csproj" />
+    <ProjectReference Include="..\SistemaBlueddit.Domain\SistemaBlueddit.Domain.csproj" />
   </ItemGroup>
 
 </Project>
