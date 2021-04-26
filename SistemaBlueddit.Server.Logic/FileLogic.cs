@@ -22,32 +22,39 @@ namespace SistemaBlueddit.Server.Logic
 
             var rawFileInMemory = new byte[fileSize];
             
-            while (fileSize > offset)
+            if(fileSize < HeaderConstants.MaxFileSize)
             {
-                if (currentPart == parts)
+                while (fileSize > offset)
                 {
-                    var lastPartSize = fileSize - offset;
-                    var data = Read(lastPartSize, networkStream);
-                    Array.Copy(data, 0, rawFileInMemory, offset, lastPartSize);
-                    offset += lastPartSize;
+                    if (currentPart == parts)
+                    {
+                        var lastPartSize = fileSize - offset;
+                        var data = Read(lastPartSize, networkStream);
+                        Array.Copy(data, 0, rawFileInMemory, offset, lastPartSize);
+                        offset += lastPartSize;
+                    }
+                    else
+                    {
+                        var data = Read(HeaderConstants.MaxPacketSize, networkStream);
+                        Array.Copy(data, 0, rawFileInMemory, offset, HeaderConstants.MaxPacketSize);
+                        offset += HeaderConstants.MaxPacketSize;
+                    }
+                    currentPart++;
                 }
-                else
-                {
-                    var data = Read(HeaderConstants.MaxPacketSize, networkStream);
-                    Array.Copy(data, 0, rawFileInMemory, offset, HeaderConstants.MaxPacketSize);
-                    offset += HeaderConstants.MaxPacketSize;
-                }
-                currentPart++;
-            }
-            fileHandler.WriteFile(filePath, rawFileInMemory);
+                fileHandler.WriteFile(filePath, rawFileInMemory);
 
-            return new BluedditFile
+                return new BluedditFile
+                {
+                    FileName = fileName,
+                    FilePath = filePath,
+                    FileSize = fileSize,
+                    CreationDate = DateTime.Now
+                };
+            }
+            else
             {
-                FileName = fileName,
-                FilePath = filePath,
-                FileSize = fileSize,
-                CreationDate = DateTime.Now
-            };
+                throw new Exception("Archivo demasiado grande para ser recibido");
+            }
         }
 
         private byte[] Read(int length, NetworkStream stream)

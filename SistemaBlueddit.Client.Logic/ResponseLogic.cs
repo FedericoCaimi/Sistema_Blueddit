@@ -11,7 +11,7 @@ namespace SistemaBlueddit.Client.Logic
         {
             var connectionStream = tcpClient.GetStream();
             var header = HeaderHandler.DecodeHeader(connectionStream);
-            HeaderHandler.ValidateHeader(header, HeaderConstants.Response, 00);
+            HeaderHandler.ValidateHeader(header, HeaderConstants.Response, Commands.Response);
             var responseData = new byte[header.DataLength];
             connectionStream.Read(responseData, 0, header.DataLength);
             var responseJson = Encoding.UTF8.GetString(responseData);

@@ -1,7 +1,5 @@
-using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
@@ -21,7 +19,7 @@ namespace SistemaBlueddit.Client.Logic
             var header = HeaderHandler.EncodeHeader(HeaderConstants.Request, command, fileSize, fileNameLength);
             var connectionStream = connectedClient.GetStream();
             
-            if (fileSize < Constants.MaxFileSize)
+            if (fileSize < HeaderConstants.MaxFileSize)
             {
                 connectionStream.Write(header);
                 connectionStream.Write(Encoding.UTF8.GetBytes(fileName));
