@@ -1,11 +1,12 @@
-﻿using SistemaBlueddit.Domain;
+﻿using SistemaBlueddit.Client.Logic.Interfaces;
+using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
 using System.Net.Sockets;
 using System.Text;
 
 namespace SistemaBlueddit.Client.Logic
 {
-    public class ResponseLogic
+    public class ResponseLogic: IResponseLogic
     {
         public Response HandleResponse(TcpClient tcpClient)
         {
