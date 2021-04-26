@@ -22,19 +22,22 @@ namespace SistemaBlueddit.Server
 
         public bool HandleLocalRequests()
         {
-            Console.WriteLine("Bienvenido al Servidor del Sistema Blueddit");
-            Console.WriteLine("0  - Cargar datos de prueba (si ya estan cargados se sobrescriben)");
-            Console.WriteLine("1  - Listar clientes conectados");
-            Console.WriteLine("2  - Listar todos los temas del sistema");
-            Console.WriteLine("3  - Listar posts por tema");
-            Console.WriteLine("4  - Listar posts por orden de creado");
-            Console.WriteLine("5  - Listar posts por orden de creado y tema");
-            Console.WriteLine("6  - Listar posts por tema y orden de creado");
-            Console.WriteLine("7  - Mostrar un post especifico");
-            Console.WriteLine("8  - Mostrar un tema o temas con mas publicaciones");
-            Console.WriteLine("9  - Mostrar archivo asociado a un post");
-            Console.WriteLine("10 - Mostrar listado de archivos");
-            Console.WriteLine("99 - salir");
+            Console.WriteLine("**********************************************************************");
+            Console.WriteLine("*        Bienvenido al Servidor del Sistema Blueddit                 *");
+            Console.WriteLine("**********************************************************************");
+            Console.WriteLine("* 0  - Cargar datos de prueba (si ya estan cargados se sobrescriben) *");
+            Console.WriteLine("* 1  - Listar clientes conectados                                    *");
+            Console.WriteLine("* 2  - Listar todos los temas del sistema                            *");
+            Console.WriteLine("* 3  - Listar posts por tema                                         *");
+            Console.WriteLine("* 4  - Listar posts por orden de creado                              *");
+            Console.WriteLine("* 5  - Listar posts por orden de creado y tema                       *");
+            Console.WriteLine("* 6  - Listar posts por tema y orden de creado                       *");
+            Console.WriteLine("* 7  - Mostrar un post especifico                                    *");
+            Console.WriteLine("* 8  - Mostrar un tema o temas con mas publicaciones                 *");
+            Console.WriteLine("* 9  - Mostrar archivo asociado a un post                            *");
+            Console.WriteLine("* 10 - Mostrar listado de archivos                                   *");
+            Console.WriteLine("* 99 - salir                                                         *");
+            Console.WriteLine("**********************************************************************");
             var option = Console.ReadLine();
             switch (option)
             {

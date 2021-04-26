@@ -72,6 +72,7 @@ namespace SistemaBlueddit.Server
                         _postLogic.AddFileToPost(bluedditFile, existingPost);
                         var fileAddedSuccess = new Response { ServerResponse = "El archivo se ha agregado al post con exito" };
                         DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, fileAddedSuccess);
+                        
                     }
                     else
                     {
