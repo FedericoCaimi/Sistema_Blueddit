@@ -25,15 +25,15 @@ namespace SistemaBlueddit.Client
 
         public void HandleLocalRequests(string clientIP, string serverIP, int serverPort)
         {
-            Console.WriteLine("Cliente se esta iniciando");
-
-            var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse(clientIP), 0));
-            tcpClient.Connect(IPAddress.Parse(serverIP), serverPort);
-
-            Console.WriteLine("Cliente se conectó al servidor.");
-
             try
             {
+                Console.WriteLine("Cliente se esta iniciando");
+
+                var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse(clientIP), 0));
+                tcpClient.Connect(IPAddress.Parse(serverIP), serverPort);
+
+                Console.WriteLine("Cliente se conectó al servidor.");
+
                 while (!exit)
                 {
                     Console.WriteLine("***************************************");

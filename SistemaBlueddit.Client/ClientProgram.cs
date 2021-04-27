@@ -19,7 +19,7 @@ namespace SistemaBlueddit.Client
 
             var clientIP = configuration.GetSection("clientIP").Value;
             var serverIP = configuration.GetSection("serverIP").Value;
-            var serverPort = Convert.ToInt32(configuration.GetSection("port").Value);
+            var serverPort = Convert.ToInt32(configuration.GetSection("serverPort").Value);
 
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
