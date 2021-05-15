@@ -22,28 +22,25 @@ namespace SistemaBlueddit.Server.Logic
             var offset = 0;
             var currentPart = 1;
 
-            var rawFileInMemory = new byte[fileSize];
-            
             if(fileSize < HeaderConstants.MaxFileSize)
             {
                 while (fileSize > offset)
                 {
+                    byte[] data;
                     if (currentPart == parts)
                     {
-                        var lastPartSize = fileSize - offset;
-                        var data = await ReadAsync(lastPartSize, networkStream);
-                        Array.Copy(data, 0, rawFileInMemory, offset, lastPartSize);
+                        var lastPartSize = (int)(fileSize - offset);
+                        data = await ReadAsync(lastPartSize, networkStream);
                         offset += lastPartSize;
                     }
                     else
                     {
-                        var data = await ReadAsync(HeaderConstants.MaxPacketSize, networkStream);
-                        Array.Copy(data, 0, rawFileInMemory, offset, HeaderConstants.MaxPacketSize);
+                        data = await ReadAsync(HeaderConstants.MaxPacketSize, networkStream);
                         offset += HeaderConstants.MaxPacketSize;
                     }
                     currentPart++;
+                    await fileHandler.WriteFileAsync(filePath, data);
                 }
-                await fileHandler.WriteFileAsync(filePath, rawFileInMemory);
 
                 return new BluedditFile
                 {

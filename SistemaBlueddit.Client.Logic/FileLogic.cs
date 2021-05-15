@@ -26,29 +26,29 @@ namespace SistemaBlueddit.Client.Logic
                 connectionStream.Write(header);
                 connectionStream.Write(Encoding.UTF8.GetBytes(fileName));
 
-                var rawFile = await fileHandler.ReadFileAsync(path);
                 var parts = fileHandler.GetFileParts(fileSize);
+                //var rawFile = await fileHandler.ReadFileAsync(path);
+                
 
                 long offset = 0;
                 long currentPart = 1;
 
                 while (fileSize > offset)
                 {
+                    byte[] dataToSend;
                     if (currentPart == parts)
                     {
-                        var lastPartSize = fileSize - offset;
-                        var dataToSend = new byte[lastPartSize];
-                        Array.Copy(rawFile, offset, dataToSend, 0, lastPartSize);
+                        var lastPartSize = (int)(fileSize - offset);
+                        dataToSend = await fileHandler.ReadFileAsync(path, offset, lastPartSize);
                         offset += lastPartSize;
-                        connectionStream.Write(dataToSend);
                     }
                     else
                     {
-                        var dataToSend = new byte[HeaderConstants.MaxPacketSize];
-                        Array.Copy(rawFile, offset, dataToSend, 0, HeaderConstants.MaxPacketSize);
+                        dataToSend = await fileHandler.ReadFileAsync(path, offset, HeaderConstants.MaxPacketSize);
                         offset += HeaderConstants.MaxPacketSize;
-                        connectionStream.Write(dataToSend);
+                        
                     }
+                    connectionStream.Write(dataToSend);
                     currentPart++;
                 }
             }

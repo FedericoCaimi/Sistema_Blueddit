@@ -67,10 +67,8 @@ namespace SistemaBlueddit.Server
             {
                 try
                 {
-                    var pepito = 1;
                     var acceptedClient = await tcpListener.AcceptTcpClientAsync();
                     _ = clientHandler.HandleClientAsync(acceptedClient, serverState);
-                    var cacaca = 5;
                 }
                 catch (SocketException se)
                 {
