@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,8 +52,7 @@ namespace SistemaBlueddit.Server
 
             serverState.IsServerTerminated = false;
 
-            var threadServer = new Thread(()=> ListenForConnections(tcpListener, serverState));
-            threadServer.Start();
+            _ = ListenForConnectionsAsync(tcpListener, serverState);
 
             while (!serverState.IsServerTerminated)
             {
@@ -61,15 +61,16 @@ namespace SistemaBlueddit.Server
             tcpListener.Stop();
         }
 
-        private static void ListenForConnections(TcpListener tcpListener, ServerState serverState)
+        private static async Task ListenForConnectionsAsync(TcpListener tcpListener, ServerState serverState)
         {
             while (!serverState.IsServerTerminated)
             {
                 try
                 {
-                    var acceptedClient = tcpListener.AcceptTcpClient();
-                    var threadClient = new Thread(() => clientHandler.HandleClient(acceptedClient, serverState));
-                    threadClient.Start();
+                    var pepito = 1;
+                    var acceptedClient = await tcpListener.AcceptTcpClientAsync();
+                    _ = clientHandler.HandleClientAsync(acceptedClient, serverState);
+                    var cacaca = 5;
                 }
                 catch (SocketException se)
                 {

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Client
 {
@@ -23,14 +24,14 @@ namespace SistemaBlueddit.Client
             _responseLogic = responseLogic;
         }
 
-        public void HandleLocalRequests(string clientIP, string serverIP, int serverPort)
+        public async Task HandleLocalRequestsAsync(string clientIP, string serverIP, int serverPort)
         {
             try
             {
                 Console.WriteLine("Cliente se esta iniciando");
 
                 var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse(clientIP), 0));
-                tcpClient.Connect(IPAddress.Parse(serverIP), serverPort);
+                await tcpClient.ConnectAsync(IPAddress.Parse(serverIP), serverPort);
 
                 Console.WriteLine("Cliente se conectó al servidor.");
 
@@ -53,15 +54,15 @@ namespace SistemaBlueddit.Client
                     {
                         case "1":
                             var topicToCreate = GetTopicToCreate();
-                            _topicLogic.Create(tcpClient, option, topicToCreate);
-                            var createTopicResponse = _responseLogic.HandleResponse(tcpClient);
-                            Console.WriteLine(createTopicResponse.ServerResponse);
+                            await _topicLogic.CreateAsync(tcpClient, option, topicToCreate);
+                            var CreateAsyncTopicResponse = await _responseLogic.HandleResponseAsync(tcpClient);
+                            Console.WriteLine(CreateAsyncTopicResponse.ServerResponse);
                             break;
                         case "2":
                             var postToCreate = GetPostToCreate();
-                            _postLogic.Create(tcpClient, option, postToCreate);
-                            var createPostResponse = _responseLogic.HandleResponse(tcpClient);
-                            Console.WriteLine(createPostResponse.ServerResponse);
+                            await _postLogic.CreateAsync(tcpClient, option, postToCreate);
+                            var CreateAsyncPostResponse = await _responseLogic.HandleResponseAsync(tcpClient);
+                            Console.WriteLine(CreateAsyncPostResponse.ServerResponse);
                             break;
                         case "3":
                             Console.WriteLine("Escriba el nombre del la publicacion");
@@ -71,15 +72,15 @@ namespace SistemaBlueddit.Client
                                 Name = postName,
                                 Topics = new List<Topic>()
                             };
-                            _postLogic.Exists(tcpClient, option, postToUploadFile);
-                            var existsPostResponse = _responseLogic.HandleResponse(tcpClient);
+                            await _postLogic.ExistsAsync(tcpClient, option, postToUploadFile);
+                            var existsPostResponse = await _responseLogic.HandleResponseAsync(tcpClient);
                             if (existsPostResponse.ServerResponse.Equals("existe"))
                             {
                                 Console.WriteLine("Escriba el path completo del archivo a subir");
                                 var path = Console.ReadLine();
                                 try{
-                                    _fileLogic.SendFile(option, path, tcpClient);
-                                    var fileSendConfirmation = _responseLogic.HandleResponse(tcpClient);
+                                    await _fileLogic.SendFileAsync(option, path, tcpClient);
+                                    var fileSendConfirmation = await _responseLogic.HandleResponseAsync(tcpClient);
                                     Console.WriteLine(fileSendConfirmation.ServerResponse);
                                 }catch(Exception e){
                                     Console.WriteLine(e.Message);
@@ -97,14 +98,14 @@ namespace SistemaBlueddit.Client
                             {
                                 Name = topicName
                             };
-                            _topicLogic.Delete(tcpClient, option, topicToDelete);
-                            var topicDeleteResponse = _responseLogic.HandleResponse(tcpClient);
+                            await _topicLogic.DeleteAsync(tcpClient, option, topicToDelete);
+                            var topicDeleteResponse = await _responseLogic.HandleResponseAsync(tcpClient);
                             Console.WriteLine(topicDeleteResponse.ServerResponse);
                             break;
                         case "5":
                             var topicToModify = GetTopicToCreate();
-                            _topicLogic.Update(tcpClient, option, topicToModify);
-                            var topicModifiedResponse = _responseLogic.HandleResponse(tcpClient);
+                            await _topicLogic.UpdateAsync(tcpClient, option, topicToModify);
+                            var topicModifiedResponse = await _responseLogic.HandleResponseAsync(tcpClient);
                             Console.WriteLine(topicModifiedResponse.ServerResponse);
                             break;
                         case "6":
@@ -115,14 +116,14 @@ namespace SistemaBlueddit.Client
                                 Name = postNameToDelete,
                                 Topics = new List<Topic>()
                             };
-                            _postLogic.Delete(tcpClient, option, postToDelete);
-                            var postDeletedResponse = _responseLogic.HandleResponse(tcpClient);
+                            await _postLogic.DeleteAsync(tcpClient, option, postToDelete);
+                            var postDeletedResponse = await _responseLogic.HandleResponseAsync(tcpClient);
                             Console.WriteLine(postDeletedResponse.ServerResponse);
                             break;
                         case "7":
                             var postToModify = GetPostToCreate();
-                            _postLogic.Update(tcpClient, option, postToModify);
-                            var postModifiedResponse = _responseLogic.HandleResponse(tcpClient);
+                            await _postLogic.UpdateAsync(tcpClient, option, postToModify);
+                            var postModifiedResponse = await _responseLogic.HandleResponseAsync(tcpClient);
                             Console.WriteLine(postModifiedResponse.ServerResponse);
                             break;
                         case "99":

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Protocol.Library
 {
@@ -30,14 +31,14 @@ namespace SistemaBlueddit.Protocol.Library
             throw new Exception("El archivo seleccionado no Existe.");
         }
     
-        public byte[] ReadFile(string path)
+        public async Task<byte[]> ReadFileAsync(string path)
         {
-            return File.ReadAllBytes(path);
+            return await File.ReadAllBytesAsync(path);
         }
 
-        public void WriteFile(string path, byte[] data)
+        public async Task WriteFileAsync(string path, byte[] data)
         {
-            File.WriteAllBytes(path,data);
+            await File.WriteAllBytesAsync(path,data);
         }
 
         public long GetFileParts(long filesize)

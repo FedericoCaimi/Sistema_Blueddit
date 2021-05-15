@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Protocol.Library
 {
@@ -19,13 +20,13 @@ namespace SistemaBlueddit.Protocol.Library
             return header;
         }
 
-        public static Header DecodeHeader(NetworkStream stream)
+        public static async Task<Header> DecodeHeaderAsync(NetworkStream stream)
         {
             try
             {
                 var headerSize = HeaderConstants.MethodLength + HeaderConstants.CommandLength + HeaderConstants.DataLength + HeaderConstants.FileNameLength;
                 var data = new byte[headerSize];
-                stream.Read(data, 0, headerSize);
+                await stream.ReadAsync(data, 0, headerSize);
                 var hasAllZeroes = data.All(singleByte => singleByte == 0);
                 if(hasAllZeroes)
                 {   

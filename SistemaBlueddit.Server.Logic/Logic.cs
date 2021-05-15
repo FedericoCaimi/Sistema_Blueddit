@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Server.Logic
 {
-    public class Logic<T> : ILogic<T> where T : ISerializable<T>
+    public class Logic<T> : ILogic<T> where T : ISerializable<T>, ISemaphoreSlim
     {
         protected List<T> _elements;
 
@@ -47,10 +49,10 @@ namespace SistemaBlueddit.Server.Logic
             return default;
         }
 
-        public void Recieve(Header header, NetworkStream stream, T objectToRecieve)
+        public async Task RecieveAsync(Header header, NetworkStream stream, T objectToRecieve)
         {
             var data = new byte[header.DataLength];
-            stream.Read(data, 0, header.DataLength);
+            await stream.ReadAsync(data, 0, header.DataLength);
             var json = Encoding.UTF8.GetString(data);
             objectToRecieve.DeserializeObject(json);
         }

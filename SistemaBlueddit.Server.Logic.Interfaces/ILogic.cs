@@ -2,12 +2,13 @@
 using SistemaBlueddit.Domain.Interface;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Server.Logic.Interfaces
 {
     public interface ILogic<T> where T : ISerializable<T>
     {
-        void Recieve(Header header, NetworkStream stream, T objectToRecieve);
+        Task RecieveAsync(Header header, NetworkStream stream, T objectToRecieve);
 
         void Add(T objectToAdd);
 

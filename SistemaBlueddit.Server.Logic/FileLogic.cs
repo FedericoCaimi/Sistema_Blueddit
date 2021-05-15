@@ -4,18 +4,19 @@ using SistemaBlueddit.Server.Logic.Interfaces;
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Server.Logic
 {
     public class FileLogic: IFileLogic
     {
-        public BluedditFile GetFile(Header header, NetworkStream networkStream)
+        public async Task<BluedditFile> GetFileAsync(Header header, NetworkStream networkStream)
         {
             var fileHandler = new FileHandler();
             var fileNameSize = header.FileNameLength;
             var fileSize = header.DataLength;
 
-            var fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmmss") + "-" + Encoding.UTF8.GetString(Read(fileNameSize, networkStream));
+            var fileName = DateTime.Now.ToString("yyyy-MM-dd-HHmmss") + "-" + Encoding.UTF8.GetString(await ReadAsync(fileNameSize, networkStream));
             var filePath = "./Files/" + fileName;
             var parts = fileHandler.GetFileParts(fileSize);
             var offset = 0;
@@ -30,19 +31,19 @@ namespace SistemaBlueddit.Server.Logic
                     if (currentPart == parts)
                     {
                         var lastPartSize = fileSize - offset;
-                        var data = Read(lastPartSize, networkStream);
+                        var data = await ReadAsync(lastPartSize, networkStream);
                         Array.Copy(data, 0, rawFileInMemory, offset, lastPartSize);
                         offset += lastPartSize;
                     }
                     else
                     {
-                        var data = Read(HeaderConstants.MaxPacketSize, networkStream);
+                        var data = await ReadAsync(HeaderConstants.MaxPacketSize, networkStream);
                         Array.Copy(data, 0, rawFileInMemory, offset, HeaderConstants.MaxPacketSize);
                         offset += HeaderConstants.MaxPacketSize;
                     }
                     currentPart++;
                 }
-                fileHandler.WriteFile(filePath, rawFileInMemory);
+                await fileHandler.WriteFileAsync(filePath, rawFileInMemory);
 
                 return new BluedditFile
                 {
@@ -58,13 +59,13 @@ namespace SistemaBlueddit.Server.Logic
             }
         }
 
-        private byte[] Read(int length, NetworkStream stream)
+        private async Task<byte[]> ReadAsync(int length, NetworkStream stream)
         {
             int dataReceived = 0;
             var data = new byte[length];
             while (dataReceived < length)
             {
-                var received = stream.Read(data, dataReceived, length - dataReceived);
+                var received = await stream.ReadAsync(data, dataReceived, length - dataReceived);
                 if (received == 0)
                 {
                     throw new Exception("La conexion se cayo");

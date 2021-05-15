@@ -1,13 +1,27 @@
 using SistemaBlueddit.Domain.Interface;
 using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace SistemaBlueddit.Domain
 {
-    public class Topic: ISerializable<Topic>
+    public class Topic: ISerializable<Topic>, ISemaphoreSlim
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        private SemaphoreSlim _SemaphoreSlim;
+
+        public SemaphoreSlim SemaphoreSlim
+        {
+            get
+            {
+                if (_SemaphoreSlim == null)
+                {
+                    _SemaphoreSlim = new SemaphoreSlim(1, 1);
+                }
+                return _SemaphoreSlim;
+            }
+        }
 
         public string Print()
         {

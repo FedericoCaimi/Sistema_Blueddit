@@ -1,16 +1,17 @@
 ﻿using SistemaBlueddit.Domain.Interface;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Client.Logic.Interfaces
 {
     public interface ILogic<T> where T : ISerializable<T>
     {
-        void Create(TcpClient connectedClient, string option, T objectToSend);
+        Task CreateAsync(TcpClient connectedClient, string option, T objectToSend);
 
-        void Update(TcpClient connectedClient, string option, T objectToSend);
+        Task UpdateAsync(TcpClient connectedClient, string option, T objectToSend);
 
-        void Exists(TcpClient connectedClient, string option, T objectToSend);
+        Task ExistsAsync(TcpClient connectedClient, string option, T objectToSend);
 
-        void Delete(TcpClient connectedClient, string option, T objectToSend);
+        Task DeleteAsync(TcpClient connectedClient, string option, T objectToSend);
     }
 }

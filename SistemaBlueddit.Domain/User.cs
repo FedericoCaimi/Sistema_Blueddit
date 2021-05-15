@@ -2,13 +2,27 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace SistemaBlueddit.Domain
 {
-    public class User: ISerializable<User>
+    public class User: ISerializable<User>, ISemaphoreSlim
     {
         public TcpClient TcpClient { get; set; }
         public DateTime StartConnection { get; set; }
+        private SemaphoreSlim _SemaphoreSlim;
+
+        public SemaphoreSlim SemaphoreSlim
+        {
+            get
+            {
+                if (_SemaphoreSlim == null)
+                {
+                    _SemaphoreSlim = new SemaphoreSlim(1, 1);
+                }
+                return _SemaphoreSlim;
+            }
+        }
 
         public string SerializeObejct()
         {

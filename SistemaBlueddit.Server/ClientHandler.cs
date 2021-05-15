@@ -3,6 +3,8 @@ using SistemaBlueddit.Protocol.Library;
 using SistemaBlueddit.Server.Logic.Interfaces;
 using System;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Server
 {
@@ -24,7 +26,7 @@ namespace SistemaBlueddit.Server
             _userLogic = userLogic;
         }
 
-        public void HandleClient(TcpClient acceptedClient, ServerState serverState)
+        public async Task HandleClientAsync(TcpClient acceptedClient, ServerState serverState)
         {
             var user = new User
             {
@@ -36,7 +38,7 @@ namespace SistemaBlueddit.Server
             {
                 while (!serverState.IsServerTerminated)
                 {
-                    HandleRequests(acceptedClient);
+                    await HandleRequestsAsync(acceptedClient);
                 }
             }
             catch (Exception e)
@@ -47,33 +49,33 @@ namespace SistemaBlueddit.Server
             Console.WriteLine("El cliente con hora de conexion " + user.StartConnection.ToString() + " se desconecto");
         }
 
-        public void HandleRequests(TcpClient acceptedClient)
+        public async Task HandleRequestsAsync(TcpClient acceptedClient)
         {
             var networkStream = acceptedClient.GetStream();
-            var header = HeaderHandler.DecodeHeader(networkStream);
+            var header = await HeaderHandler.DecodeHeaderAsync(networkStream);
             HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
             switch (header.Command)
             {
                 case Commands.CreateNewTopic:
-                    HandleCreateNewTopic(acceptedClient, header, networkStream);
+                    await HandleCreateNewTopicAsync(acceptedClient, header, networkStream);
                     break;
                 case Commands.CreateNewPost:
-                    HandleCreateNewPost(acceptedClient, header, networkStream);
+                    await HandleCreateNewPostAsync(acceptedClient, header, networkStream);
                     break;
                 case Commands.UploadFile:
-                    HandleUploadFile(acceptedClient, header, networkStream);
+                    await HandleUploadFileAsync(acceptedClient, header, networkStream);
                     break;
                 case Commands.DeleteTopic:
-                    HandleDeleteTopic(acceptedClient, header, networkStream);
+                    await HandleDeleteTopicAsync(acceptedClient, header, networkStream);
                     break;
                 case Commands.ModifyTopic:
-                    HandleModifyTopic(acceptedClient, header, networkStream);
+                    await HandleModifyTopicAsync(acceptedClient, header, networkStream);
                     break;
                 case Commands.DeletePost:
-                    HandleDeletePost(acceptedClient, header, networkStream);
+                    await HandleDeletePostAsync(acceptedClient, header, networkStream);
                     break;
                 case Commands.ModifyPost:
-                    HandleModifyPost(acceptedClient, header, networkStream);
+                    await HandleModifyPostAsync(acceptedClient, header, networkStream);
                     break;
                 default:
                     Console.WriteLine("Opcion invalida...");
@@ -81,179 +83,212 @@ namespace SistemaBlueddit.Server
             }
         }
 
-        private void HandleCreateNewTopic(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleCreateNewTopicAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var topicRecieved = new Topic();
-            _topicLogic.Recieve(header, networkStream, topicRecieved);
+            await _topicLogic.RecieveAsync(header, networkStream, topicRecieved);
             if (_topicLogic.Validate(topicRecieved))
             {
                 _topicLogic.Add(topicRecieved);
                 var topicCreatedSuccess = new Response { ServerResponse = "El tema se ha creado con exito" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicCreatedSuccess);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicCreatedSuccess);
             }
             else
             {
                 var topicCreatedError = new Response { ServerResponse = "Error. El tema ya existe" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicCreatedError);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicCreatedError);
             }
         }
 
-        private void HandleCreateNewPost(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleCreateNewPostAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var postRecieved = new Post();
-            _postLogic.Recieve(header, networkStream, postRecieved);
+            await _postLogic.RecieveAsync(header, networkStream, postRecieved);
             if (_postLogic.Validate(postRecieved) && _topicLogic.ValidateTopics(postRecieved.Topics))
             {
                 _postLogic.Add(postRecieved);
                 var postCreatedSuccess = new Response { ServerResponse = "El post se ha creado con exito" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postCreatedSuccess);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postCreatedSuccess);
             }
             else
             {
                 var postCreatedError = new Response { ServerResponse = "Error. El post ya existe o los temas no son validos" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postCreatedError);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postCreatedError);
             }
         }
 
-        private void HandleUploadFile(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleUploadFileAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var postToAddFile = new Post();
-            _postLogic.Recieve(header, networkStream, postToAddFile);
+            await _postLogic.RecieveAsync(header, networkStream, postToAddFile);
             var existingPost = _postLogic.GetByName(postToAddFile.Name);
             if (existingPost != null)
             {
                 var existsPost = new Response { ServerResponse = "existe" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, existsPost);
-                header = HeaderHandler.DecodeHeader(networkStream);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, existsPost);
+                header = await HeaderHandler.DecodeHeaderAsync(networkStream);
                 HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
-                var bluedditFile = _fileLogic.GetFile(header, networkStream);
+                var bluedditFile = await _fileLogic.GetFileAsync(header, networkStream);
                 _postLogic.AddFileToPost(bluedditFile, existingPost);
                 var fileAddedSuccess = new Response { ServerResponse = "El archivo se ha agregado al post con exito" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, fileAddedSuccess);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, fileAddedSuccess);
 
             }
             else
             {
                 var notExistsPost = new Response { ServerResponse = "noexiste" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, notExistsPost);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, notExistsPost);
             }
         }
 
-        private void HandleDeleteTopic(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleDeleteTopicAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var topicToRemove = new Topic();
-            _topicLogic.Recieve(header, networkStream, topicToRemove);
+            await _topicLogic.RecieveAsync(header, networkStream, topicToRemove);
             var topicToRemoveLock = _topicLogic.GetByName(topicToRemove.Name);
             if (topicToRemoveLock != null)
             {
-                lock (topicToRemoveLock)
+                try
                 {
+                    Console.WriteLine("Esperando...");
+                    await topicToRemoveLock.SemaphoreSlim.WaitAsync();
+                    Console.WriteLine($"Borrando a {topicToRemoveLock.Name}...");
+                    Thread.Sleep(2000);
                     var existingTopic = _topicLogic.GetByName(topicToRemove.Name);
                     if (existingTopic != null)
                     {
                         if (_postLogic.IsTopicInPost(existingTopic))
                         {
                             var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
-                            DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDeleteError);
+                            await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDeleteError);
                         }
                         else
                         {
                             _topicLogic.Delete(existingTopic);
                             var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
-                            DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDeleteSuccess);
+                            await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDeleteSuccess);
                         }
                     }
                     else
                     {
                         var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
-                        DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDoesntExist);
+                        await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDoesntExist);
                     }
+                }
+                finally
+                {
+                    Console.WriteLine("Finally");
+                    topicToRemoveLock.SemaphoreSlim.Release();               
                 }
             }
             else
             {
                 var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDoesntExist);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDoesntExist);
             }
         }
 
-        private void HandleModifyTopic(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleModifyTopicAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var topicToModify = new Topic();
-            _topicLogic.Recieve(header, networkStream, topicToModify);
+            await _topicLogic.RecieveAsync(header, networkStream, topicToModify);
             var topicToModifyLock = _topicLogic.GetByName(topicToModify.Name);
             if (topicToModifyLock != null)
             {
-                lock (topicToModifyLock)
+                try
                 {
+                    Console.WriteLine("Esperando...");
+                    await topicToModifyLock.SemaphoreSlim.WaitAsync();
+                    Console.WriteLine($"Modificando a {topicToModifyLock.Name}...");
+                    Thread.Sleep(2000);
                     var topicResponse = _topicLogic.ModifyTopic(topicToModify);
                     var topicModifiedResponse = new Response { ServerResponse = topicResponse };
-                    DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedResponse);
+                    await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedResponse);
+                }
+                finally
+                {
+                    topicToModifyLock.SemaphoreSlim.Release();
                 }
             }
             else
             {
                 var topicModifiedErrorResponse = new Response { ServerResponse = "El tema no existe" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedErrorResponse);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedErrorResponse);
             }
         }
 
-        private void HandleDeletePost(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleDeletePostAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var postToRemove = new Post();
-            _postLogic.Recieve(header, networkStream, postToRemove);
+            await _postLogic.RecieveAsync(header, networkStream, postToRemove);
             var postToRemoveLock = _postLogic.GetByName(postToRemove.Name);
             if (postToRemoveLock != null)
             {
-                lock (postToRemoveLock)
+                try
                 {
+                    Console.WriteLine("Esperando...");
+                    await postToRemoveLock.SemaphoreSlim.WaitAsync();
+                    Console.WriteLine($"Borrando a {postToRemoveLock.Name}...");
+                    Thread.Sleep(2000);
                     var existingPostToRemove = _postLogic.GetByName(postToRemove.Name);
                     if (existingPostToRemove != null)
                     {
                         _postLogic.Delete(existingPostToRemove);
                         var deletedPostSuccess = new Response { ServerResponse = "El post ingresado se ha borrado con exito." };
-                        DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, deletedPostSuccess);
+                        await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, deletedPostSuccess);
                     }
                     else
                     {
                         var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
-                        DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
+                        await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
                     };
+                }
+                finally
+                {
+                    postToRemoveLock.SemaphoreSlim.Release();
                 }
             }
             else
             {
                 var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
             };
         }
 
-        private void HandleModifyPost(TcpClient acceptedClient, Header header, NetworkStream networkStream)
+        private async Task HandleModifyPostAsync(TcpClient acceptedClient, Header header, NetworkStream networkStream)
         {
             var postToModify = new Post();
-            _postLogic.Recieve(header, networkStream, postToModify);
+            await _postLogic.RecieveAsync(header, networkStream, postToModify);
             if (_topicLogic.ValidateTopics(postToModify.Topics))
             {
                 var modifyPostLock = _postLogic.GetByName(postToModify.Name);
                 if (modifyPostLock != null)
                 {
-                    lock (modifyPostLock)
+                    try
                     {
+                        Console.WriteLine("Esperando...");
+                        await modifyPostLock.SemaphoreSlim.WaitAsync();
+                        Console.WriteLine($"Modificando a {modifyPostLock.Name}...");
+                        Thread.Sleep(2000);
                         var postResponse = _postLogic.ModifyPost(postToModify);
                         var modifyPostResponse = new Response { ServerResponse = postResponse };
-                        DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponse);
+                        await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponse);
+                    }
+                    finally
+                    {
+                        modifyPostLock.SemaphoreSlim.Release();
                     }
                 }
                 else
                 {
                     var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
-                    DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
+                    await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
                 }
             }
             else
             {
                 var modifyPostResponseTopicError = new Response { ServerResponse = "Error. Los temas ingresados no son validos" };
-                DataHandler<Response>.SendData(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponseTopicError);
+                await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponseTopicError);
             }
         }
     }

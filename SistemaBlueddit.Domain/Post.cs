@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace SistemaBlueddit.Domain
 {
-    public class Post: ISerializable<Post>
+    public class Post: ISerializable<Post>, ISemaphoreSlim
     {
         public string Name { get; set; }
 
@@ -16,6 +17,18 @@ namespace SistemaBlueddit.Domain
         public DateTime CreationDate { get; set; }
 
         public BluedditFile File { get; set; }
+
+        private SemaphoreSlim _SemaphoreSlim;
+
+        public SemaphoreSlim SemaphoreSlim { 
+            get {
+                if(_SemaphoreSlim == null)
+                {
+                    _SemaphoreSlim = new SemaphoreSlim(1, 1);
+                }
+                return _SemaphoreSlim;
+            }
+        }
 
         public string SerializeObejct()
         {

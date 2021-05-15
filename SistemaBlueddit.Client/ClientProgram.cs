@@ -5,6 +5,7 @@ using SistemaBlueddit.Client.Logic;
 using SistemaBlueddit.Client.Logic.Interfaces;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Client
 {
@@ -13,7 +14,7 @@ namespace SistemaBlueddit.Client
         public static LocalRequestHandler localRequestHandler;
         public static IConfigurationRoot configuration;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             BuildConfig();
 
@@ -38,7 +39,7 @@ namespace SistemaBlueddit.Client
 
             localRequestHandler = new LocalRequestHandler(topicLogic, postLogic, fileLogic, responseLogic);
 
-            localRequestHandler.HandleLocalRequests(clientIP, serverIP, serverPort);
+            await localRequestHandler.HandleLocalRequestsAsync(clientIP, serverIP, serverPort);
         }
 
         private static void BuildConfig()

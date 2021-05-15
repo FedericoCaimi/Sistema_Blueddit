@@ -3,12 +3,13 @@ using SistemaBlueddit.Protocol.Library;
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Client.Logic
 {
     public class FileLogic: IFileLogic
     {
-        public void SendFile(string option, string path, TcpClient connectedClient)
+        public async Task SendFileAsync(string option, string path, TcpClient connectedClient)
         {
             var fileHandler = new FileHandler();
 
@@ -25,7 +26,7 @@ namespace SistemaBlueddit.Client.Logic
                 connectionStream.Write(header);
                 connectionStream.Write(Encoding.UTF8.GetBytes(fileName));
 
-                var rawFile = fileHandler.ReadFile(path);
+                var rawFile = await fileHandler.ReadFileAsync(path);
                 var parts = fileHandler.GetFileParts(fileSize);
 
                 long offset = 0;
