@@ -18,10 +18,5 @@ namespace SistemaBlueddit.Protocol.Library
             await connectionStream.WriteAsync(header);
             await connectionStream.WriteAsync(Encoding.UTF8.GetBytes(objectSerialized));
         }
-
-        public static Task SendDataAsync<T>(TcpClient connectedClient, string option, string request, T objectToSend) where T : ISerializable<T>
-        {
-            throw new NotImplementedException();
-        }
     }
 }

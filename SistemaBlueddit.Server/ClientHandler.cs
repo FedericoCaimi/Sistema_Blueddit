@@ -150,10 +150,7 @@ namespace SistemaBlueddit.Server
             {
                 try
                 {
-                    Console.WriteLine("Esperando...");
                     await topicToRemoveLock.SemaphoreSlim.WaitAsync();
-                    Console.WriteLine($"Borrando a {topicToRemoveLock.Name}...");
-                    Thread.Sleep(2000);
                     var existingTopic = _topicLogic.GetByName(topicToRemove.Name);
                     if (existingTopic != null)
                     {
@@ -177,7 +174,6 @@ namespace SistemaBlueddit.Server
                 }
                 finally
                 {
-                    Console.WriteLine("Finally");
                     topicToRemoveLock.SemaphoreSlim.Release();               
                 }
             }
@@ -197,10 +193,7 @@ namespace SistemaBlueddit.Server
             {
                 try
                 {
-                    Console.WriteLine("Esperando...");
                     await topicToModifyLock.SemaphoreSlim.WaitAsync();
-                    Console.WriteLine($"Modificando a {topicToModifyLock.Name}...");
-                    Thread.Sleep(2000);
                     var topicResponse = _topicLogic.ModifyTopic(topicToModify);
                     var topicModifiedResponse = new Response { ServerResponse = topicResponse };
                     await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedResponse);
@@ -226,10 +219,7 @@ namespace SistemaBlueddit.Server
             {
                 try
                 {
-                    Console.WriteLine("Esperando...");
                     await postToRemoveLock.SemaphoreSlim.WaitAsync();
-                    Console.WriteLine($"Borrando a {postToRemoveLock.Name}...");
-                    Thread.Sleep(2000);
                     var existingPostToRemove = _postLogic.GetByName(postToRemove.Name);
                     if (existingPostToRemove != null)
                     {
@@ -266,10 +256,7 @@ namespace SistemaBlueddit.Server
                 {
                     try
                     {
-                        Console.WriteLine("Esperando...");
                         await modifyPostLock.SemaphoreSlim.WaitAsync();
-                        Console.WriteLine($"Modificando a {modifyPostLock.Name}...");
-                        Thread.Sleep(2000);
                         var postResponse = _postLogic.ModifyPost(postToModify);
                         var modifyPostResponse = new Response { ServerResponse = postResponse };
                         await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponse);

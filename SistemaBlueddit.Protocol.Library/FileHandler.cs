@@ -31,16 +31,6 @@ namespace SistemaBlueddit.Protocol.Library
             throw new Exception("El archivo seleccionado no Existe.");
         }
     
-        /*public async Task<byte[]> ReadFileAsync(string path)
-        {
-            return await File.ReadAllBytesAsync(path);
-        }
-
-        public async Task WriteFileAsync(string path, byte[] data)
-        {
-            await File.WriteAllBytesAsync(path,data);
-        }*/
-
         public async Task<byte[]> ReadFileAsync(string path, long offset, int length)
         {
             var data = new byte[length];

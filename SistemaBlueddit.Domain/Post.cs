@@ -18,15 +18,15 @@ namespace SistemaBlueddit.Domain
 
         public BluedditFile File { get; set; }
 
-        private SemaphoreSlim _SemaphoreSlim;
+        private SemaphoreSlim _semaphoreSlim;
 
         public SemaphoreSlim SemaphoreSlim { 
             get {
-                if(_SemaphoreSlim == null)
+                if(_semaphoreSlim == null)
                 {
-                    _SemaphoreSlim = new SemaphoreSlim(1, 1);
+                    _semaphoreSlim = new SemaphoreSlim(1, 1);
                 }
-                return _SemaphoreSlim;
+                return _semaphoreSlim;
             }
         }
 

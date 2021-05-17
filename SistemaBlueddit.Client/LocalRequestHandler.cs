@@ -55,14 +55,14 @@ namespace SistemaBlueddit.Client
                         case "1":
                             var topicToCreate = GetTopicToCreate();
                             await _topicLogic.CreateAsync(tcpClient, option, topicToCreate);
-                            var CreateAsyncTopicResponse = await _responseLogic.HandleResponseAsync(tcpClient);
-                            Console.WriteLine(CreateAsyncTopicResponse.ServerResponse);
+                            var createTopicResponse = await _responseLogic.HandleResponseAsync(tcpClient);
+                            Console.WriteLine(createTopicResponse.ServerResponse);
                             break;
                         case "2":
                             var postToCreate = GetPostToCreate();
                             await _postLogic.CreateAsync(tcpClient, option, postToCreate);
-                            var CreateAsyncPostResponse = await _responseLogic.HandleResponseAsync(tcpClient);
-                            Console.WriteLine(CreateAsyncPostResponse.ServerResponse);
+                            var createPostResponse = await _responseLogic.HandleResponseAsync(tcpClient);
+                            Console.WriteLine(createPostResponse.ServerResponse);
                             break;
                         case "3":
                             Console.WriteLine("Escriba el nombre del la publicacion");
