@@ -1,22 +1,27 @@
-﻿using SistemaBlueddit.Domain;
+﻿using Newtonsoft.Json;
+using RabbitMQ.Client;
+using SistemaBlueddit.Domain;
 using SistemaBlueddit.Domain.Interface;
 using SistemaBlueddit.Server.Logic.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SistemaBlueddit.Server.Logic
 {
     public class Logic<T> : ILogic<T> where T : ISerializable<T>, ISemaphoreSlim
     {
+        private Type _type;
+
         protected List<T> _elements;
 
         public Logic()
         {
             _elements = new List<T>();
+            _type = typeof(T);
         }
 
         public void Add(T objectToAdd)
@@ -82,6 +87,35 @@ namespace SistemaBlueddit.Server.Logic
         public bool Validate(T objectToValidate)
         {
             return !_elements.Exists(p => p.Equals(objectToValidate));
+        }
+
+        public Task<bool> SendMessageAsync(IModel channel, string message)
+        {
+            bool returnVal;
+            var type = _type.ToString();
+            var log = new Log
+            {
+                LogType = type,
+                Message = message,
+                CreationDate = DateTime.Now
+            };
+            try
+            {
+                var logJson = JsonConvert.SerializeObject(log);
+                var body = Encoding.UTF8.GetBytes(logJson);
+                channel.BasicPublish(exchange: "",
+                    routingKey: "log_queue",
+                    basicProperties: null,
+                    body: body);
+                returnVal = true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                returnVal = false;
+            }
+
+            return Task.FromResult(returnVal);
         }
     }
 }

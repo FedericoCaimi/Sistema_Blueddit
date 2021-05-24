@@ -1,4 +1,5 @@
-﻿using SistemaBlueddit.Domain;
+﻿using RabbitMQ.Client;
+using SistemaBlueddit.Domain;
 using SistemaBlueddit.Domain.Interface;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -29,5 +30,7 @@ namespace SistemaBlueddit.Server.Logic.Interfaces
         void Delete(T objectToDelete);
 
         bool Validate(T objectToValidate);
+
+        Task<bool> SendMessageAsync(IModel channel, string message);
     }
 }
