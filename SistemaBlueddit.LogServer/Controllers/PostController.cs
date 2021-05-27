@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SistemaBlueddit.Domain;
+using SistemaBlueddit.LogServer.Logic.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace SistemaBlueddit.LogServer.Controllers
 {
@@ -13,8 +15,8 @@ namespace SistemaBlueddit.LogServer.Controllers
     public class PostController : ControllerBase
     {
 
-        private IPostLogic PostLogic;
-        public PostController(IPostLogic postLogic) : base()
+        private IPostLogLogic PostLogic;
+        public PostController(IPostLogLogic postLogic) : base()
         {
             this.PostLogic = postLogic;
         }
