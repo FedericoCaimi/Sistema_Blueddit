@@ -18,15 +18,15 @@ namespace SistemaBlueddit.Server
 
         private IUserLogic _userLogic;
 
-        private IModel _channel;
+        private IRabbitMQMessageLogic _messageLogic;
 
-        public ClientHandler(ITopicLogic topicLogic, IPostLogic postLogic, IFileLogic fileLogic, IUserLogic userLogic, IModel channel)
+        public ClientHandler(ITopicLogic topicLogic, IPostLogic postLogic, IFileLogic fileLogic, IUserLogic userLogic, IRabbitMQMessageLogic messageLogic)
         {
             _topicLogic = topicLogic;
             _postLogic = postLogic;
             _fileLogic = fileLogic;
             _userLogic = userLogic;
-            _channel = channel;
+            _messageLogic = messageLogic;
         }
 
         public async Task HandleClientAsync(TcpClient acceptedClient, ServerState serverState)
@@ -93,15 +93,15 @@ namespace SistemaBlueddit.Server
             if (_topicLogic.Validate(topicRecieved))
             {
                 _topicLogic.Add(topicRecieved);
-                var topicCreatedSuccess = new Response { ServerResponse = "El tema se ha creado con exito" };
+                var topicCreatedSuccess = new Response { ServerResponse = $"El tema {topicRecieved.Name} se ha creado con exito" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicCreatedSuccess);
-                await _topicLogic.SendMessageAsync(_channel, topicCreatedSuccess.ServerResponse);
+                await _messageLogic.SendMessageAsync(topicCreatedSuccess.ServerResponse, "Topic");
             }
             else
             {
                 var topicCreatedError = new Response { ServerResponse = "Error. El tema ya existe" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicCreatedError);
-                await _topicLogic.SendMessageAsync(_channel, topicCreatedError.ServerResponse);
+                await _messageLogic.SendMessageAsync(topicCreatedError.ServerResponse, "Topic");
             }
         }
 
@@ -112,15 +112,15 @@ namespace SistemaBlueddit.Server
             if (_postLogic.Validate(postRecieved) && _topicLogic.ValidateTopics(postRecieved.Topics))
             {
                 _postLogic.Add(postRecieved);
-                var postCreatedSuccess = new Response { ServerResponse = "El post se ha creado con exito" };
+                var postCreatedSuccess = new Response { ServerResponse = $"El post {postRecieved.Name} se ha creado con exito" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postCreatedSuccess);
-                await _postLogic.SendMessageAsync(_channel, postCreatedSuccess.ServerResponse);
+                await _messageLogic.SendMessageAsync(postCreatedSuccess.ServerResponse, "Post");
             }
             else
             {
                 var postCreatedError = new Response { ServerResponse = "Error. El post ya existe o los temas no son validos" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postCreatedError);
-                await _postLogic.SendMessageAsync(_channel, postCreatedError.ServerResponse);
+                await _messageLogic.SendMessageAsync(postCreatedError.ServerResponse, "Post");
             }
         }
 
@@ -137,16 +137,16 @@ namespace SistemaBlueddit.Server
                 HeaderHandler.ValidateHeader(header, HeaderConstants.Request);
                 var bluedditFile = await _fileLogic.GetFileAsync(header, networkStream);
                 _postLogic.AddFileToPost(bluedditFile, existingPost);
-                var fileAddedSuccess = new Response { ServerResponse = "El archivo se ha agregado al post con exito" };
+                var fileAddedSuccess = new Response { ServerResponse = $"El archivo {bluedditFile.FileName} se ha agregado al post {existingPost.Name} con exito" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, fileAddedSuccess);
-                await _postLogic.SendMessageAsync(_channel, fileAddedSuccess.ServerResponse);
+                await _messageLogic.SendMessageAsync(fileAddedSuccess.ServerResponse, "Post");
 
             }
             else
             {
                 var notExistsPost = new Response { ServerResponse = "noexiste" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, notExistsPost);
-                await _postLogic.SendMessageAsync(_channel, "No existe el post al que se le quiere agregar el archivo");
+                await _messageLogic.SendMessageAsync("No existe el post al que se le quiere agregar el archivo", "Post");
             }
         }
 
@@ -167,21 +167,21 @@ namespace SistemaBlueddit.Server
                         {
                             var topicDeleteError = new Response { ServerResponse = "Error. No se puede borrar el tema porque esta asociado a un post." };
                             await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDeleteError);
-                            await _topicLogic.SendMessageAsync(_channel, topicDeleteError.ServerResponse);
+                            await _messageLogic.SendMessageAsync(topicDeleteError.ServerResponse, "Topic");
                         }
                         else
                         {
                             _topicLogic.Delete(existingTopic);
-                            var topicDeleteSuccess = new Response { ServerResponse = "El tema ingresado se ha borrado con exito." };
+                            var topicDeleteSuccess = new Response { ServerResponse = $"El tema {existingTopic.Name} se ha borrado con exito." };
                             await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDeleteSuccess);
-                            await _topicLogic.SendMessageAsync(_channel, topicDeleteSuccess.ServerResponse);
+                            await _messageLogic.SendMessageAsync(topicDeleteSuccess.ServerResponse, "Topic");
                         }
                     }
                     else
                     {
                         var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
                         await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDoesntExist);
-                        await _topicLogic.SendMessageAsync(_channel, topicDoesntExist.ServerResponse);
+                        await _messageLogic.SendMessageAsync(topicDoesntExist.ServerResponse, "Topic");
                     }
                 }
                 finally
@@ -193,7 +193,7 @@ namespace SistemaBlueddit.Server
             {
                 var topicDoesntExist = new Response { ServerResponse = "No existe el tema con el nombre ingresado." };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicDoesntExist);
-                await _topicLogic.SendMessageAsync(_channel, topicDoesntExist.ServerResponse);
+                await _messageLogic.SendMessageAsync(topicDoesntExist.ServerResponse, "Topic");
             }
         }
 
@@ -210,7 +210,7 @@ namespace SistemaBlueddit.Server
                     var topicResponse = _topicLogic.ModifyTopic(topicToModify);
                     var topicModifiedResponse = new Response { ServerResponse = topicResponse };
                     await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedResponse);
-                    await _topicLogic.SendMessageAsync(_channel, topicModifiedResponse.ServerResponse);
+                    await _messageLogic.SendMessageAsync(topicModifiedResponse.ServerResponse, "Topic");
                 }
                 finally
                 {
@@ -221,7 +221,7 @@ namespace SistemaBlueddit.Server
             {
                 var topicModifiedErrorResponse = new Response { ServerResponse = "El tema no existe" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, topicModifiedErrorResponse);
-                await _topicLogic.SendMessageAsync(_channel, topicModifiedErrorResponse.ServerResponse);
+                await _messageLogic.SendMessageAsync(topicModifiedErrorResponse.ServerResponse, "Topic");
             }
         }
 
@@ -239,15 +239,15 @@ namespace SistemaBlueddit.Server
                     if (existingPostToRemove != null)
                     {
                         _postLogic.Delete(existingPostToRemove);
-                        var deletedPostSuccess = new Response { ServerResponse = "El post ingresado se ha borrado con exito." };
+                        var deletedPostSuccess = new Response { ServerResponse = $"El post {existingPostToRemove.Name} se ha borrado con exito." };
                         await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, deletedPostSuccess);
-                        await _postLogic.SendMessageAsync(_channel, deletedPostSuccess.ServerResponse);
+                        await _messageLogic.SendMessageAsync(deletedPostSuccess.ServerResponse, "Post");
                     }
                     else
                     {
                         var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
                         await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
-                        await _postLogic.SendMessageAsync(_channel, postDeleteError.ServerResponse);
+                        await _messageLogic.SendMessageAsync(postDeleteError.ServerResponse, "Post");
                     };
                 }
                 finally
@@ -259,6 +259,7 @@ namespace SistemaBlueddit.Server
             {
                 var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
+                await _messageLogic.SendMessageAsync(postDeleteError.ServerResponse, "Post");
             };
         }
 
@@ -277,7 +278,7 @@ namespace SistemaBlueddit.Server
                         var postResponse = _postLogic.ModifyPost(postToModify);
                         var modifyPostResponse = new Response { ServerResponse = postResponse };
                         await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponse);
-                        await _postLogic.SendMessageAsync(_channel, modifyPostResponse.ServerResponse);
+                        await _messageLogic.SendMessageAsync(modifyPostResponse.ServerResponse, "Post");
                     }
                     finally
                     {
@@ -288,14 +289,14 @@ namespace SistemaBlueddit.Server
                 {
                     var postDeleteError = new Response { ServerResponse = "No existe el post con el nombre ingresado." };
                     await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, postDeleteError);
-                    await _postLogic.SendMessageAsync(_channel, postDeleteError.ServerResponse);
+                    await _messageLogic.SendMessageAsync(postDeleteError.ServerResponse, "Post");
                 }
             }
             else
             {
                 var modifyPostResponseTopicError = new Response { ServerResponse = "Error. Los temas ingresados no son validos" };
                 await DataHandler<Response>.SendDataAsync(acceptedClient, Commands.Response.ToString(), HeaderConstants.Response, modifyPostResponseTopicError);
-                await _postLogic.SendMessageAsync(_channel, modifyPostResponseTopicError.ServerResponse);
+                await _messageLogic.SendMessageAsync(modifyPostResponseTopicError.ServerResponse, "Post");
             }
         }
     }

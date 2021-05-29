@@ -177,7 +177,7 @@ namespace SistemaBlueddit.Server.Logic
                 existingPost.Name = postToModify.Name;
                 existingPost.Content = postToModify.Content;
                 existingPost.Topics = postToModify.Topics;
-                return "Post modificado con exito";
+                return $"Post {existingPost.Name} modificado con exito";
             }
             else
             {

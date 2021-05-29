@@ -30,7 +30,5 @@ namespace SistemaBlueddit.Server.Logic.Interfaces
         void Delete(T objectToDelete);
 
         bool Validate(T objectToValidate);
-
-        Task<bool> SendMessageAsync(IModel channel, string message);
     }
 }

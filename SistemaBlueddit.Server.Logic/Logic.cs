@@ -88,34 +88,5 @@ namespace SistemaBlueddit.Server.Logic
         {
             return !_elements.Exists(p => p.Equals(objectToValidate));
         }
-
-        public Task<bool> SendMessageAsync(IModel channel, string message)
-        {
-            bool returnVal;
-            var type = _type.ToString();
-            var log = new Log
-            {
-                LogType = type,
-                Message = message,
-                CreationDate = DateTime.Now
-            };
-            try
-            {
-                var logJson = JsonConvert.SerializeObject(log);
-                var body = Encoding.UTF8.GetBytes(logJson);
-                channel.BasicPublish(exchange: "",
-                    routingKey: "log_queue",
-                    basicProperties: null,
-                    body: body);
-                returnVal = true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                returnVal = false;
-            }
-
-            return Task.FromResult(returnVal);
-        }
     }
 }

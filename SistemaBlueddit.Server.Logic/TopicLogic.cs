@@ -30,7 +30,7 @@ namespace SistemaBlueddit.Server.Logic
             {
                 var topicIndex = _elements.FindIndex(t => t.Equals(topic));
                 _elements[topicIndex] = topic;
-                return "El tema se modifico con exito";
+                return $"El tema {topic.Name} se modifico con exito";
             }
             else
             {
