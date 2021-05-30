@@ -50,7 +50,7 @@ namespace SistemaBlueddit.Server
             var postLogic = host.Services.GetRequiredService<IPostLogic>();
             var fileLogic = host.Services.GetRequiredService<IFileLogic>();
 
-            localRequestHandler = new LocalRequestHandler(userLogic, topicLogic, postLogic);
+            localRequestHandler = new LocalRequestHandler(userLogic, topicLogic, postLogic, messageLogic);
             clientHandler = new ClientHandler(topicLogic, postLogic, fileLogic, userLogic, messageLogic);
 
             serverState.IsServerTerminated = false;

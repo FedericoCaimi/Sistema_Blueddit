@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using SistemaBlueddit.Domain;
+using SistemaBlueddit.LogServer.Logic;
+using SistemaBlueddit.LogServer.Logic.Interfaces;
+using System.Text;
+using System.Text.Json;
 
 namespace SistemaBlueddit.LogServer
 {
@@ -27,25 +27,27 @@ namespace SistemaBlueddit.LogServer
         {
             services.AddControllers();
 
-            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton(Configuration);
 
-            services.AddCors(
-                options =>
-                {
-                    options.AddPolicy(
-            "CorsPolicy",
-            builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-                );
-                }
-            );
+            services.AddSingleton<ILogLogic, LogLogic>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                    .SetIsOriginAllowed(_ => true)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogLogic logLogic)
         {
+            InitializeRabbitMQ(logLogic);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -61,6 +63,31 @@ namespace SistemaBlueddit.LogServer
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void InitializeRabbitMQ(ILogLogic logLogic)
+        {
+            var rabbitIP = Configuration.GetValue<string>("rabbitIP");
+            var factory = new ConnectionFactory() { HostName = rabbitIP };
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
+
+            channel.QueueDeclare("log_queue",
+                false,
+                false,
+                false,
+                null);
+
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (sender, eventArgs) =>
+            {
+                var body = eventArgs.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                var log = JsonSerializer.Deserialize<Log>(message);
+                logLogic.AddLog(log);
+            };
+
+            channel.BasicConsume("log_queue", true, consumer);
         }
     }
 }

@@ -1,11 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SistemaBlueddit.Domain\SistemaBlueddit.Domain.csproj" />
     <ProjectReference Include="..\SistemaBlueddit.LogServer.Logic.Interfaces\SistemaBlueddit.LogServer.Logic.Interfaces.csproj" />
+    <ProjectReference Include="..\SistemaBlueddit.LogServer.Logic\SistemaBlueddit.LogServer.Logic.csproj" />
   </ItemGroup>
 </Project>

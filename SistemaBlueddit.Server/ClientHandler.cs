@@ -1,5 +1,4 @@
-﻿using RabbitMQ.Client;
-using SistemaBlueddit.Domain;
+﻿using SistemaBlueddit.Domain;
 using SistemaBlueddit.Protocol.Library;
 using SistemaBlueddit.Server.Logic.Interfaces;
 using System;

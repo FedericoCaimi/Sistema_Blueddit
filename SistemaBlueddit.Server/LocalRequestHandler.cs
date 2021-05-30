@@ -13,11 +13,14 @@ namespace SistemaBlueddit.Server
 
         private IPostLogic _postLogic;
 
-        public LocalRequestHandler(IUserLogic userLogic, ITopicLogic topicLogic, IPostLogic postLogic)
+        private IRabbitMQMessageLogic _messageLogic;
+
+        public LocalRequestHandler(IUserLogic userLogic, ITopicLogic topicLogic, IPostLogic postLogic, IRabbitMQMessageLogic messageLogic)
         {
             _userLogic = userLogic;
             _topicLogic = topicLogic;
             _postLogic = postLogic;
+            _messageLogic = messageLogic;
         }
 
         public void HandleLocalRequests(ServerState serverState)
@@ -48,6 +51,7 @@ namespace SistemaBlueddit.Server
                     _postLogic.Clear();
                     _topicLogic.AddMultiple(mockedTopics);
                     _postLogic.AddMultiple(mockedPosts);
+                    LogAddedTopicsAndPosts(mockedTopics, mockedPosts);
                     break;
                 case "1":
                     var usersToShow = _userLogic.ShowAll();
@@ -172,6 +176,19 @@ namespace SistemaBlueddit.Server
                     return postsByTopicsOrderBySize;
                 default:
                     return "Opcion invalida...";
+            }
+        }
+
+        private void LogAddedTopicsAndPosts(List<Topic> mockedTopics, List<Post> mockedPosts)
+        {
+            foreach(var topic in mockedTopics)
+            {
+
+                _messageLogic.SendMessageAsync($"El topic {topic.Name} se ha creado con exito.", "Topic");
+            }
+            foreach (var post in mockedPosts)
+            {
+                _messageLogic.SendMessageAsync($"El topic {post.Name} se ha creado con exito.", "Post");
             }
         }
     }

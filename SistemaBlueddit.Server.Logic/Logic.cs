@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using RabbitMQ.Client;
-using SistemaBlueddit.Domain;
+﻿using SistemaBlueddit.Domain;
 using SistemaBlueddit.Domain.Interface;
 using SistemaBlueddit.Server.Logic.Interfaces;
 using System;
