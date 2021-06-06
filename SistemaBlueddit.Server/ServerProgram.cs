@@ -1,11 +1,14 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Server.Logic;
 using SistemaBlueddit.Server.Logic.Interfaces;
@@ -18,8 +21,7 @@ namespace SistemaBlueddit.Server
         public static ClientHandler clientHandler;
         public static IConfigurationRoot configuration;
         public static ServerState serverState = new ServerState();
-
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Server esta iniciando...");
 
@@ -31,8 +33,7 @@ namespace SistemaBlueddit.Server
             var tcpListener = new TcpListener(IPAddress.Parse(serverIP), port);
             tcpListener.Start(10);
 
-            var host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
+            var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<IRabbitMQMessageLogic>(service => 
                         ActivatorUtilities.CreateInstance<RabbitMQMessageLogic>(service, serverIP)
@@ -42,7 +43,10 @@ namespace SistemaBlueddit.Server
                     services.AddSingleton<IPostLogic, PostLogic>();
                     services.AddSingleton<IFileLogic, FileLogic>();
                 })
-                .Build();            
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                }).Build();
 
             var messageLogic = host.Services.GetRequiredService<IRabbitMQMessageLogic>();
             var userLogic = host.Services.GetRequiredService<IUserLogic>();
@@ -63,6 +67,8 @@ namespace SistemaBlueddit.Server
             }
             tcpListener.Stop();
             messageLogic.DisposeConnections();
+            
+            //CreateHostBuilder(args).Build().Run();
         }
 
         private static async Task ListenForConnectionsAsync(TcpListener tcpListener, ServerState serverState)
@@ -94,5 +100,15 @@ namespace SistemaBlueddit.Server
                 .AddJsonFile("appsettings.json", false)
                 .Build();
         }
+
+        // Additional configuration is required to successfully run gRPC on macOS.
+        // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
+        /*public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });*/
+            
     }
 }

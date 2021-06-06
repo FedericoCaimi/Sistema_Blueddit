@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "SistemaBlueddit.Server";
+
+package topics;
+
+// The greeting service definition.
+service Topics {
+  // Sends a greeting
+  rpc GetTopics (TopicsRequest) returns (TopicsResponse);
+}
+
+// The request message containing the user's name.
+message TopicsRequest {
+  string topicName = 1;
+}
+
+// The response message containing the greetings.
+message TopicsResponse {
+  string topicName = 1;
+}
