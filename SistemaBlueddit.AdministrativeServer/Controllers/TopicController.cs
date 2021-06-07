@@ -4,36 +4,35 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
+using Grpc.Net.Client;
 
 namespace SistemaBlueddit.AdministrativeServer.Controllers
 {
     [ApiController]
-    [Route("[topic]")]
+    [Route("topic")]
     public class TopicController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
+        public TopicController()
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
-        {
-            _logger = logger;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Get([FromQuery(Name = "name")] string type = null)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            try
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                var channel = GrpcChannel.ForAddress("http://localhost:5003");
+                var client = new Topics.TopicsClient(channel);
+                var replay  = await client.GetTopicsAsync( new TopicsRequest{ TopicName = "tema1"});
+                return Ok(replay.TopicName);
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

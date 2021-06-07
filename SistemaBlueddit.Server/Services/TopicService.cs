@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using SistemaBlueddit.Domain;
 using SistemaBlueddit.Server.Logic.Interfaces;
 
 namespace SistemaBlueddit.Server
@@ -20,9 +21,11 @@ namespace SistemaBlueddit.Server
 
         public override Task<TopicsResponse> GetTopics(TopicsRequest request, ServerCallContext context)
         {
+            var name = request.TopicName;
+            Topic topic = _topicLogic.GetByName(name);
             return Task.FromResult(new TopicsResponse
             {
-                TopicName = "Hello " + request.TopicName
+                TopicName = "Hello " + topic.Name
             });
         }
     }
