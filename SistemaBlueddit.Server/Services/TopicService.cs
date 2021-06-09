@@ -21,11 +21,19 @@ namespace SistemaBlueddit.Server
 
         public override Task<TopicsResponse> GetTopics(TopicsRequest request, ServerCallContext context)
         {
-            var name = request.TopicName;
+            /*var name = request.TopicName;
+            Topic topic = _topicLogic.GetByName(name);*/
+            var name = request.Topic;
+            var topic1 = new Topic
+            {
+                Name = name,
+                Description = "descripcion"+name
+            };
+            _topicLogic.Add(topic1);
             Topic topic = _topicLogic.GetByName(name);
             return Task.FromResult(new TopicsResponse
             {
-                TopicName = "Hello " + topic.Name
+                Message = "Hello 2 " + topic.Print()
             });
         }
     }

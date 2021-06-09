@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "SistemaBlueddit.AdministrativeServer";
+option csharp_namespace = "GrpcGreeterClient";
 
 package topics;
 

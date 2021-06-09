@@ -45,8 +45,10 @@ namespace SistemaBlueddit.Server
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    //es boqueante
                     webBuilder.UseStartup<Startup>();
-                }).Build();
+                })
+                .Build();
 
             var messageLogic = host.Services.GetRequiredService<IRabbitMQMessageLogic>();
             var userLogic = host.Services.GetRequiredService<IUserLogic>();
@@ -60,13 +62,15 @@ namespace SistemaBlueddit.Server
             serverState.IsServerTerminated = false;
 
             _ = ListenForConnectionsAsync(tcpListener, serverState);
-
+            
+            host.Run();
             while (!serverState.IsServerTerminated)
             {
                 localRequestHandler.HandleLocalRequests(serverState);
             }
             tcpListener.Stop();
             messageLogic.DisposeConnections();
+            
             
             //CreateHostBuilder(args).Build().Run();
         }
@@ -108,7 +112,7 @@ namespace SistemaBlueddit.Server
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });*/
-            
+                });
+            */
     }
 }

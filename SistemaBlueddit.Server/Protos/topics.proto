@@ -9,9 +9,10 @@ service Topics {
 }
 
 message TopicsRequest {
-  string topicName = 1;
+  string topic = 1;
 }
 
 message TopicsResponse {
-  string topicName = 1;
+  string message = 1;
 }
+
