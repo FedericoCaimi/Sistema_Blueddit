@@ -1,3 +1,4 @@
+using System.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,34 +46,14 @@ namespace SistemaBlueddit.Server
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    //es boqueante
                     webBuilder.UseStartup<Startup>();
                 })
                 .Build();
-
-            var messageLogic = host.Services.GetRequiredService<IRabbitMQMessageLogic>();
-            var userLogic = host.Services.GetRequiredService<IUserLogic>();
-            var topicLogic = host.Services.GetRequiredService<ITopicLogic>();
-            var postLogic = host.Services.GetRequiredService<IPostLogic>();
-            var fileLogic = host.Services.GetRequiredService<IFileLogic>();
-
-            localRequestHandler = new LocalRequestHandler(userLogic, topicLogic, postLogic, messageLogic);
-            clientHandler = new ClientHandler(topicLogic, postLogic, fileLogic, userLogic, messageLogic);
-
-            serverState.IsServerTerminated = false;
-
-            _ = ListenForConnectionsAsync(tcpListener, serverState);
             
+            _ = HandleCustomRequestsAsync(host, tcpListener);
+
             host.Run();
-            while (!serverState.IsServerTerminated)
-            {
-                localRequestHandler.HandleLocalRequests(serverState);
-            }
-            tcpListener.Stop();
-            messageLogic.DisposeConnections();
-            
-            
-            //CreateHostBuilder(args).Build().Run();
+        
         }
 
         private static async Task ListenForConnectionsAsync(TcpListener tcpListener, ServerState serverState)
@@ -105,14 +86,31 @@ namespace SistemaBlueddit.Server
                 .Build();
         }
 
-        // Additional configuration is required to successfully run gRPC on macOS.
-        // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
-        /*public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+        public static Task HandleCustomRequestsAsync(IHost host, TcpListener tcpListener)
+        {
+            return Task.Run(() => 
+            {
+                var messageLogic = host.Services.GetRequiredService<IRabbitMQMessageLogic>();
+                var userLogic = host.Services.GetRequiredService<IUserLogic>();
+                var topicLogic = host.Services.GetRequiredService<ITopicLogic>();
+                var postLogic = host.Services.GetRequiredService<IPostLogic>();
+                var fileLogic = host.Services.GetRequiredService<IFileLogic>();
+
+                localRequestHandler = new LocalRequestHandler(userLogic, topicLogic, postLogic, messageLogic);
+                clientHandler = new ClientHandler(topicLogic, postLogic, fileLogic, userLogic, messageLogic);
+
+                serverState.IsServerTerminated = false;
+
+                _ = ListenForConnectionsAsync(tcpListener, serverState);
+
+                while (!serverState.IsServerTerminated)
                 {
-                    webBuilder.UseStartup<Startup>();
-                });
-            */
+                    localRequestHandler.HandleLocalRequests(serverState);
+                }
+                tcpListener.Stop();
+                messageLogic.DisposeConnections();
+            });
+        }
+            
     }
 }
