@@ -17,4 +17,8 @@
     <Protobuf Include="Protos\topics.proto" GrpcServices="Client" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaBlueddit.Domain\SistemaBlueddit.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
