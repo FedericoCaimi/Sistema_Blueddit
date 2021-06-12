@@ -1,4 +1,5 @@
-﻿using SistemaBlueddit.Domain.Interface;
+﻿using Newtonsoft.Json;
+using SistemaBlueddit.Domain.Interface;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -12,6 +13,7 @@ namespace SistemaBlueddit.Domain
         public DateTime StartConnection { get; set; }
         private SemaphoreSlim _semaphoreSlim;
 
+        [JsonIgnore]
         public SemaphoreSlim SemaphoreSlim
         {
             get

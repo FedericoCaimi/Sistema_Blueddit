@@ -5,13 +5,15 @@ option csharp_namespace = "SistemaBlueddit.AdministrativeServer";
 package topics;
 
 service Topics {
-  rpc GetTopics (TopicsRequest) returns (TopicsResponse);
+  rpc GetTopics(GetTopicByNameRequest) returns (JsonResponse);
 }
 
-message TopicsRequest {
-  string topic = 1;
+message GetTopicByNameRequest {
+  string topicName = 1;
 }
 
-message TopicsResponse {
-  string message = 1;
+message JsonResponse {
+  string json = 1;
 }
+
+message Empty { }

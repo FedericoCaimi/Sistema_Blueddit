@@ -1,4 +1,5 @@
-﻿using SistemaBlueddit.Domain.Interface;
+﻿using Newtonsoft.Json;
+using SistemaBlueddit.Domain.Interface;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -20,6 +21,7 @@ namespace SistemaBlueddit.Domain
 
         private SemaphoreSlim _semaphoreSlim;
 
+        [JsonIgnore]
         public SemaphoreSlim SemaphoreSlim { 
             get {
                 if(_semaphoreSlim == null)
