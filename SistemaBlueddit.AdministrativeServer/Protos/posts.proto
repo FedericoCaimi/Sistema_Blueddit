@@ -1,0 +1,41 @@
+syntax = "proto3";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "SistemaBlueddit.AdministrativeServer";
+
+package posts;
+
+service Posts {
+  rpc GetPosts(EmptyPost) returns (PostResponse);
+  rpc GetPostsByName(PostRequest) returns (PostResponse);
+  rpc AddPost(PostRequest) returns (PostResponse);
+  rpc AddTopicToPost(PostRequest) returns (PostResponse); 
+  rpc UpdatePost(PostRequest) returns (PostResponse);
+  rpc DeletePost(PostRequest) returns (PostResponse);
+}
+
+message PostRequest {
+	string name = 1;
+	string content = 2;
+	repeated TopicInPost topics = 3;
+	google.protobuf.Timestamp creationDate = 4;
+}
+
+message TopicInPost{
+	string name = 1;
+	string description = 2;
+}
+
+message PostResponse {
+	message Post {
+		string name = 1;
+		string content = 2;
+		repeated TopicInPost topics = 3;
+		google.protobuf.Timestamp creationDate = 4;
+	}
+	repeated Post posts = 1;
+	string message = 2;
+}
+
+message EmptyPost { }

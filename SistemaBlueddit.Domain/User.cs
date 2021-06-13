@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using SistemaBlueddit.Domain.Interface;
+﻿using SistemaBlueddit.Domain.Interface;
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace SistemaBlueddit.Domain

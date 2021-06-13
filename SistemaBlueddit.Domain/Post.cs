@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using SistemaBlueddit.Domain.Interface;
+﻿using SistemaBlueddit.Domain.Interface;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -17,6 +17,7 @@ namespace SistemaBlueddit.Domain
 
         public DateTime CreationDate { get; set; }
 
+        [JsonIgnore]
         public BluedditFile File { get; set; }
 
         private SemaphoreSlim _semaphoreSlim;

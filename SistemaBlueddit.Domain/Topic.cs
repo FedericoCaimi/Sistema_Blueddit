@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
 using SistemaBlueddit.Domain.Interface;
 using System;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 

@@ -26,9 +26,4 @@ message TopicResponse {
 	string message = 2;
 }
 
-message JsonResponse {
-  string content = 1;
-  string message = 2;
-}
-
 message Empty { }

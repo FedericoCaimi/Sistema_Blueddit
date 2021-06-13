@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SistemaBlueddit.Server.Services;
 
 namespace SistemaBlueddit.Server
 {
@@ -28,6 +29,8 @@ namespace SistemaBlueddit.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<TopicService>();
+
+                endpoints.MapGrpcService<PostService>();
 
                 endpoints.MapGet("/", async context =>
                 {

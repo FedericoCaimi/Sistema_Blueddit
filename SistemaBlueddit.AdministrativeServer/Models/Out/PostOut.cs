@@ -4,15 +4,9 @@ using SistemaBlueddit.Domain;
 
 namespace SistemaBlueddit.AdministrativeServer.Models
 {
-    public class TopicOut
+    public class PostOut
     {
-        public string Content { get; set; }
+        public List<Post> Posts { get; set; }
         public string Message { get; set; }
-
-        public TopicOut()
-        {
-
-        }
-
     }
 }
