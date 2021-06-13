@@ -110,6 +110,27 @@ namespace SistemaBlueddit.Server.Services
             };
         }
 
+        public override async Task<PostResponse> DeletePost(PostRequest request, ServerCallContext context)
+        {
+            var name = request.Name;
+            var message = "";
+
+            var existingPost = _postLogic.GetByName(name);
+            if (existingPost != null)
+            {
+                _postLogic.Delete(existingPost);
+                message = $"El post {name} se ha borrado con exito.";
+            }
+            else
+            {
+                 message = $"No existe el post con el nombre {name}.";
+            }
+            await _messageLogic.SendMessageAsync(message, "Post");
+            return new PostResponse
+            {
+                Message = message
+            };
+        }
         private List<PostResponse.Types.Post> ToGrpcPosts(List<Post> posts)
         {
             var grpcPosts = new List<PostResponse.Types.Post>();

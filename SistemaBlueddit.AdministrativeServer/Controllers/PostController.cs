@@ -108,6 +108,24 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             }
         }
 
+        [HttpDelete("{name}", Name = "DeletePost")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Delete(string name)
+        {
+            try
+            {
+                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                var client = new Posts.PostsClient(channel);
+                var reply  = await client.DeletePostAsync( new PostRequest{ Name = name});
+                
+                return Ok(reply);
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
         private List<Post> ToDomainPost(RepeatedField<PostResponse.Types.Post> grpcPosts)
         {
             var posts = new List<Post>();
@@ -124,6 +142,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             }
             return posts;
         }
+
 
         private List<Topic> ToDomainTopic(RepeatedField<TopicInPost> grpcTopics)
         {
