@@ -60,6 +60,54 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             }
         }
 
+        [HttpPost()]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddPost([FromBody] PostIn postIn)
+        {
+            try
+            {
+                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                var client = new Posts.PostsClient(channel);
+                var reply  = await client.AddPostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {ToGrpcTopics(postIn.Topics)}});
+                
+                var response = new PostOut
+                {
+                    Posts = ToDomainPost(reply.Posts),
+                    Message = reply.Message
+                };
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut()]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdatePost([FromBody] PostIn postIn)
+        {
+            try
+            {
+                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                var client = new Posts.PostsClient(channel);
+                var reply  = await client.UpdatePostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {ToGrpcTopics(postIn.Topics)}});
+                
+                var response = new PostOut
+                {
+                    Posts = ToDomainPost(reply.Posts),
+                    Message = reply.Message
+                };
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         private List<Post> ToDomainPost(RepeatedField<PostResponse.Types.Post> grpcPosts)
         {
             var posts = new List<Post>();
@@ -90,6 +138,21 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 topics.Add(topic);
             }
             return topics;
+        }
+
+        private List<TopicInPost> ToGrpcTopics(List<Topic> topics)
+        {
+            var grpcTopics = new List<TopicInPost>();
+            foreach (var topic in topics)
+            {
+                var grpcTopic = new TopicInPost
+                {
+                    Name = topic.Name,
+                    Description = topic.Description
+                };
+                grpcTopics.Add(grpcTopic);
+            }
+            return grpcTopics;
         }
     }
 }
