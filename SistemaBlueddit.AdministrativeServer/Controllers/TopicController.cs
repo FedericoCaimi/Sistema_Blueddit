@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Grpc.Net.Client;
 using SistemaBlueddit.AdministrativeServer.Models;
@@ -27,13 +24,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.GetTopicsAsync( new Empty{ });
                 
-                //var response = reply.Json;
-                var topicOut = new TopicOut{
-                    Content = reply.Content,
-                    Message = reply.Message
-                };
-
-                return Ok(topicOut);
+                return Ok(reply);
             }
             catch (Exception e)
             {
@@ -52,13 +43,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.GetTopicsByNameAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
                 
-                //var response = reply.Json;
-                var topicOut = new TopicOut{
-                    Content = reply.Content,
-                    Message = reply.Message
-                };
-
-                return Ok(topicOut);
+                return Ok(reply);
             }
             catch (Exception e)
             {
@@ -77,13 +62,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.AddTopicAsync( new TopicRequest{ TopicName = topicIn.Name, TopicDescription = topicIn.Description});
                 
-                //var response = reply.Json;
-                var topicOut = new TopicOut{
-                    Content = reply.Content,
-                    Message = reply.Message
-                };
-
-                return Ok(topicOut);
+                return Ok(reply);
             }
             catch (Exception)
             {
@@ -94,7 +73,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         [HttpPut("{name}", Name = "UpdateTopic")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Upate(string name, [FromBody] TopicIn topicIn)
+        public async Task<IActionResult> Update(string name, [FromBody] TopicIn topicIn)
         {
             try
             {
@@ -102,13 +81,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.UpdateTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = topicIn.Description});
                 
-                //var response = reply.Json;
-                var topicOut = new TopicOut{
-                    Content = reply.Content,
-                    Message = reply.Message
-                };
-
-                return Ok(topicOut);
+                return Ok(reply);
             }
             catch (Exception)
             {
@@ -119,7 +92,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         [HttpDelete("{name}", Name = "DeleteTopic")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Upate(string name)
+        public async Task<IActionResult> Delete(string name)
         {
             try
             {
@@ -127,13 +100,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.DeleteTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
                 
-                //var response = reply.Json;
-                var topicOut = new TopicOut{
-                    Content = reply.Content,
-                    Message = reply.Message
-                };
-
-                return Ok(topicOut);
+                return Ok(reply);
             }
             catch (Exception)
             {
