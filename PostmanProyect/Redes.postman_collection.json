@@ -1,137 +1,280 @@
 {
 	"info": {
-		"_postman_id": "77780fb7-a94e-4253-a238-82ac5fa36744",
+		"_postman_id": "57ce7465-4496-4e8b-b493-ebf05231d746",
 		"name": "Redes",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "GetTopic",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "AdministrativeServer",
+			"item": [
+				{
+					"name": "Topic",
+					"item": [
+						{
+							"name": "GetTopic",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/topic",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"topic"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetTopicByName",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5000/topic/tema1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"topic",
+										"tema1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddTopic",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"tema5\",\r\n    \"Description\": \"Descripcion tema 5\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/topic",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"topic"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UpdateTopic",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"tema1\",\r\n    \"Description\": \"Descripcion tema 1 actualizado\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/topic/tema1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"topic",
+										"tema1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DeleteTopic",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5000/topic/tema1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"topic",
+										"tema1"
+									]
+								}
+							},
+							"response": []
 						}
-					}
+					]
 				},
-				"url": {
-					"raw": "http://localhost:5000/topic",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"topic"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetTopicByName",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:5000/topic/tema1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"topic",
-						"tema1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "AddTopic",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"Name\": \"tema1\",\r\n    \"Description\": \"Descripcion tema 1\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Post",
+					"item": [
+						{
+							"name": "GetPost",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{AdminServer}}/post",
+									"host": [
+										"{{AdminServer}}"
+									],
+									"path": [
+										"post"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetPostByName",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{AdminServer}}/post/post1",
+									"host": [
+										"{{AdminServer}}"
+									],
+									"path": [
+										"post",
+										"post1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddPost",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Post1\",\r\n    \"Content\": \"algo\",\r\n    \"Topics\": [{\r\n        \"Name\":\"topic1\",\r\n        \"Description\":\"asdf\"\r\n    }]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{AdminServer}}/post",
+									"host": [
+										"{{AdminServer}}"
+									],
+									"path": [
+										"post"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DeletePost",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{AdminServer}}/post/post1",
+									"host": [
+										"{{AdminServer}}"
+									],
+									"path": [
+										"post",
+										"post1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UpdatePost",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"post1\",\r\n    \"Content\": \"update post\",\r\n    \"Topics\": [{\r\n        \"Name\":\"topic1\",\r\n        \"Description\":\"asdf\"\r\n    }]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{AdminServer}}/post/",
+									"host": [
+										"{{AdminServer}}"
+									],
+									"path": [
+										"post",
+										""
+									]
+								}
+							},
+							"response": []
 						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:5000/topic",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"topic"
 					]
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "UpdateTopic",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"Name\": \"tema1\",\r\n    \"Description\": \"Descripcion tema 1 actualizado\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Logs",
+			"item": [
+				{
+					"name": "GetLogs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LogServer}}/log",
+							"host": [
+								"{{LogServer}}"
+							],
+							"path": [
+								"log"
+							]
 						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:5000/topic/tema1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"topic",
-						"tema1"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteTopic",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:5000/topic/tema1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"topic",
-						"tema1"
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	]
 }
