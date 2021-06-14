@@ -6,6 +6,7 @@ using SistemaBlueddit.Server.Logic.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using SistemaBlueddit.Server.Helpers;
 
 namespace SistemaBlueddit.Server.Services
 {
@@ -29,7 +30,7 @@ namespace SistemaBlueddit.Server.Services
             var message = posts.Count == 0 ? "No se encontraron posts" : "";
             return Task.FromResult(new PostResponse
             {
-                Posts = { ToGrpcPosts(posts) },
+                Posts = { GrpcMapperHelper.ToGrpcPosts(posts) },
                 Message = message
             });
         }
@@ -42,14 +43,14 @@ namespace SistemaBlueddit.Server.Services
 
             return Task.FromResult(new PostResponse
             {
-                Posts = { ToGrpcPosts(new List<Post> { post }) },
+                Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
                 Message = message
             });
         }
 
         public override async Task<PostResponse> AddPost(PostRequest request, ServerCallContext context)
         {
-            var topics = ToTopicList(request.Topics);
+            var topics = GrpcMapperHelper.ToTopicList(request.Topics);
             var post = new Post{
                 Name = request.Name,
                 Content = request.Content,
@@ -71,14 +72,14 @@ namespace SistemaBlueddit.Server.Services
 
             return new PostResponse
             {
-                Posts = { ToGrpcPosts(new List<Post> { post }) },
+                Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
                 Message = message
             };
         }
 
         public override async Task<PostResponse> UpdatePost(PostRequest request, ServerCallContext context)
         {
-            var topics = ToTopicList(request.Topics);
+            var topics = GrpcMapperHelper.ToTopicList(request.Topics);
             var post = new Post{
                 Name = request.Name,
                 Content = request.Content,
@@ -105,7 +106,7 @@ namespace SistemaBlueddit.Server.Services
 
             return new PostResponse
             {
-                Posts = { ToGrpcPosts(new List<Post> { post }) },
+                Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
                 Message = message
             };
         }
@@ -130,52 +131,6 @@ namespace SistemaBlueddit.Server.Services
             {
                 Message = message
             };
-        }
-        private List<PostResponse.Types.Post> ToGrpcPosts(List<Post> posts)
-        {
-            var grpcPosts = new List<PostResponse.Types.Post>();
-            foreach (var post in posts)
-            {
-                var grpcPost = new PostResponse.Types.Post
-                {
-                    Name = post.Name,
-                    Content = post.Content,
-                    Topics = { ToGrpcTopics(post.Topics) },
-                    CreationDate = Timestamp.FromDateTime(post.CreationDate.ToUniversalTime())
-                };
-                grpcPosts.Add(grpcPost);
-            }
-            return grpcPosts;
-        }
-
-        private List<TopicInPost> ToGrpcTopics(List<Topic> topics)
-        {
-            var grpcTopics = new List<TopicInPost>();
-            foreach (var topic in topics)
-            {
-                var grpcTopic = new TopicInPost
-                {
-                    Name = topic.Name,
-                    Description = topic.Description
-                };
-                grpcTopics.Add(grpcTopic);
-            }
-            return grpcTopics;
-        }
-
-        private List<Topic> ToTopicList(RepeatedField<TopicInPost> grpcTopics)
-        {
-            var topics = new List<Topic>();
-            foreach (var grpcTopic in grpcTopics)
-            {
-                var topic = new Topic
-                {
-                    Name = grpcTopic.Name,
-                    Description = grpcTopic.Description
-                };
-                topics.Add(topic);
-            }
-            return topics;
         }
     }
 }

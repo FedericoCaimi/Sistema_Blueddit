@@ -2,6 +2,8 @@
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using SistemaBlueddit.AdministrativeServer.Helpers;
 using SistemaBlueddit.AdministrativeServer.Models;
 using SistemaBlueddit.Domain;
 using System;
@@ -14,6 +16,16 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
     [Route("post")]
     public class PostController: ControllerBase
     {
+        private IConfiguration _configuration;
+
+        private string _serverAddress;
+
+        public PostController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _serverAddress = _configuration.GetSection("serverAddress").Value;
+        }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -21,12 +33,12 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Posts.PostsClient(channel);
                 var reply = await client.GetPostsAsync(new EmptyPost { });
                 var response = new PostOut
                 {
-                    Posts = ToDomainPost(reply.Posts),
+                    Posts = GrpcMapperHelper.ToDomainPost(reply.Posts),
                     Message = reply.Message
                 };
                 return Ok(response);
@@ -44,12 +56,12 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Posts.PostsClient(channel);
                 var reply = await client.GetPostsByNameAsync(new PostRequest { Name = name });
                 var response = new PostOut
                 {
-                    Posts = ToDomainPost(reply.Posts),
+                    Posts = GrpcMapperHelper.ToDomainPost(reply.Posts),
                     Message = reply.Message
                 };
                 return Ok(response);
@@ -67,13 +79,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Posts.PostsClient(channel);
-                var reply  = await client.AddPostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {ToGrpcTopics(postIn.Topics)}});
+                var reply  = await client.AddPostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {GrpcMapperHelper.ToGrpcTopics(postIn.Topics)}});
                 
                 var response = new PostOut
                 {
-                    Posts = ToDomainPost(reply.Posts),
+                    Posts = GrpcMapperHelper.ToDomainPost(reply.Posts),
                     Message = reply.Message
                 };
                 return Ok(response);
@@ -91,13 +103,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Posts.PostsClient(channel);
-                var reply  = await client.UpdatePostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {ToGrpcTopics(postIn.Topics)}});
+                var reply  = await client.UpdatePostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = { GrpcMapperHelper.ToGrpcTopics(postIn.Topics)}});
                 
                 var response = new PostOut
                 {
-                    Posts = ToDomainPost(reply.Posts),
+                    Posts = GrpcMapperHelper.ToDomainPost(reply.Posts),
                     Message = reply.Message
                 };
                 return Ok(response);
@@ -115,7 +127,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Posts.PostsClient(channel);
                 var reply  = await client.DeletePostAsync( new PostRequest{ Name = name});
                 
@@ -125,53 +137,6 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             {
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
-        }
-        private List<Post> ToDomainPost(RepeatedField<PostResponse.Types.Post> grpcPosts)
-        {
-            var posts = new List<Post>();
-            foreach(var grpcPost in grpcPosts)
-            {
-                var post = new Post
-                {
-                    Name = grpcPost.Name,
-                    Content = grpcPost.Content,
-                    CreationDate = grpcPost.CreationDate.ToDateTime(),
-                    Topics = ToDomainTopic(grpcPost.Topics)
-                };
-                posts.Add(post);
-            }
-            return posts;
-        }
-
-
-        private List<Topic> ToDomainTopic(RepeatedField<TopicInPost> grpcTopics)
-        {
-            var topics = new List<Topic>();
-            foreach (var grpcTopic in grpcTopics)
-            {
-                var topic = new Topic
-                {
-                    Name = grpcTopic.Name,
-                    Description = grpcTopic.Description
-                };
-                topics.Add(topic);
-            }
-            return topics;
-        }
-
-        private List<TopicInPost> ToGrpcTopics(List<Topic> topics)
-        {
-            var grpcTopics = new List<TopicInPost>();
-            foreach (var topic in topics)
-            {
-                var grpcTopic = new TopicInPost
-                {
-                    Name = topic.Name,
-                    Description = topic.Description
-                };
-                grpcTopics.Add(grpcTopic);
-            }
-            return grpcTopics;
         }
     }
 }

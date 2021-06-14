@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 using SistemaBlueddit.Domain;
+using SistemaBlueddit.Server.Helpers;
 using SistemaBlueddit.Server.Logic.Interfaces;
 
 namespace SistemaBlueddit.Server
@@ -27,7 +28,7 @@ namespace SistemaBlueddit.Server
             var message = topics.Count == 0 ? "No se encontraron temas" : "";
             return Task.FromResult(new TopicResponse
             {
-                Topics = { ToGrpcTopics(topics) },
+                Topics = { GrpcMapperHelper.ToGrpcTopics(topics) },
                 Message = message
             });
         }
@@ -40,7 +41,7 @@ namespace SistemaBlueddit.Server
 
             return Task.FromResult(new TopicResponse
             {
-                Topics = { ToGrpcTopics(new List<Topic>{ topic }) },
+                Topics = { GrpcMapperHelper.ToGrpcTopics(new List<Topic>{ topic }) },
                 Message = message
             });
         }
@@ -62,7 +63,7 @@ namespace SistemaBlueddit.Server
 
             return new TopicResponse
             {
-                Topics = { ToGrpcTopics(new List<Topic> { topic }) },
+                Topics = { GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic }) },
                 Message = message
             };
         }
@@ -82,7 +83,7 @@ namespace SistemaBlueddit.Server
 
             return new TopicResponse
             {
-                Topics = { ToGrpcTopics(new List<Topic> { topic }) },
+                Topics = { GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic }) },
                 Message = message
             };
         }
@@ -114,21 +115,6 @@ namespace SistemaBlueddit.Server
             {
                 Message = message
             };
-        }
-
-        private List<TopicResponse.Types.Topic> ToGrpcTopics(List<Topic> topics)
-        {
-            var grpcTopics = new List<TopicResponse.Types.Topic>();
-            foreach (var topic in topics)
-            {
-                var grpcTopic = new TopicResponse.Types.Topic
-                {
-                    Name = topic.Name,
-                    Description = topic.Description
-                };
-                grpcTopics.Add(grpcTopic);
-            }
-            return grpcTopics;
         }
     }
 }

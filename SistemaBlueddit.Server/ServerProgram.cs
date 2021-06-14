@@ -33,9 +33,7 @@ namespace SistemaBlueddit.Server
 
             var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, services) =>
                 {
-                    services.AddSingleton<IRabbitMQMessageLogic>(service => 
-                        ActivatorUtilities.CreateInstance<RabbitMQMessageLogic>(service, serverIP)
-                    );
+                    services.AddSingleton<IRabbitMQMessageLogic, RabbitMQMessageLogic>();
                     services.AddSingleton<IUserLogic, UserLogic>();
                     services.AddSingleton<ITopicLogic, TopicLogic>();
                     services.AddSingleton<IPostLogic, PostLogic>();

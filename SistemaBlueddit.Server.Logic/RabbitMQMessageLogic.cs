@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using SistemaBlueddit.Domain;
 using SistemaBlueddit.Server.Logic.Interfaces;
@@ -14,9 +15,9 @@ namespace SistemaBlueddit.Server.Logic
 
         private IConnection _connection;
 
-        public RabbitMQMessageLogic(string serverIP)
+        public RabbitMQMessageLogic(IConfiguration configuration)
         {
-            InitializeRabbitMq(serverIP);
+            InitializeRabbitMq(configuration.GetSection("serverIP").Value);
         }
 
         public Task<bool> SendMessageAsync(string message, string type)

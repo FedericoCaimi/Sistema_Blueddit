@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Grpc.Net.Client;
 using SistemaBlueddit.AdministrativeServer.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace SistemaBlueddit.AdministrativeServer.Controllers
 {
@@ -11,7 +12,15 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
     [Route("topic")]
     public class TopicController : ControllerBase
     {
-        public TopicController() { }
+        private IConfiguration _configuration;
+
+        private string _serverAddress;
+
+        public TopicController(IConfiguration configuration) 
+        {
+            _configuration = configuration;
+            _serverAddress = _configuration.GetSection("serverAddress").Value;
+        }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,7 +29,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.GetTopicsAsync( new Empty{ });
                 
@@ -39,7 +48,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.GetTopicsByNameAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
                 
@@ -58,7 +67,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.AddTopicAsync( new TopicRequest{ TopicName = topicIn.Name, TopicDescription = topicIn.Description});
                 
@@ -77,7 +86,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.UpdateTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = topicIn.Description});
                 
@@ -96,7 +105,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress("https://localhost:5003");
+                using var channel = GrpcChannel.ForAddress(_serverAddress);
                 var client = new Topics.TopicsClient(channel);
                 var reply  = await client.DeleteTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
                 

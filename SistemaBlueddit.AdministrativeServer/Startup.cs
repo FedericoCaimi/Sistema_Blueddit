@@ -25,10 +25,12 @@ namespace SistemaBlueddit.AdministrativeServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            var serverIP = Configuration.GetSection("serverIP").Value;
+
+             services.AddControllers();
              services.AddSingleton(Configuration);
              services.AddCors(options =>
-            {
+             {
                 options.AddPolicy("CorsPolicy",
                     builder => builder
                     .SetIsOriginAllowed(_ => true)
