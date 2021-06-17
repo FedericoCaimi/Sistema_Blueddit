@@ -20,10 +20,14 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
         private string _serverAddress;
 
+        private Posts.PostsClient _client;
+
         public PostController(IConfiguration configuration)
         {
             _configuration = configuration;
             _serverAddress = _configuration.GetSection("serverAddress").Value;
+            using var channel = GrpcChannel.ForAddress(_serverAddress);
+            _client = new Posts.PostsClient(channel);
         }
 
         [HttpGet]
@@ -33,9 +37,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Posts.PostsClient(channel);
-                var reply = await client.GetPostsAsync(new EmptyPost { });
+                var reply = await _client.GetPostsAsync(new EmptyPost { });
                 var response = new PostOut
                 {
                     Posts = GrpcMapperHelper.ToDomainPost(reply.Posts),
@@ -45,7 +47,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             }
             catch (Exception e)
             {
-                return Ok(e.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -56,9 +58,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Posts.PostsClient(channel);
-                var reply = await client.GetPostsByNameAsync(new PostRequest { Name = name });
+                var reply = await _client.GetPostsByNameAsync(new PostRequest { Name = name });
                 var response = new PostOut
                 {
                     Posts = GrpcMapperHelper.ToDomainPost(reply.Posts),
@@ -68,20 +68,18 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             }
             catch (Exception e)
             {
-                return Ok(e.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPost()]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddPost([FromBody] PostIn postIn)
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Posts.PostsClient(channel);
-                var reply  = await client.AddPostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {GrpcMapperHelper.ToGrpcTopics(postIn.Topics)}});
+                var reply  = await _client.AddPostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = {GrpcMapperHelper.ToGrpcTopics(postIn.Topics)}});
                 
                 var response = new PostOut
                 {
@@ -97,15 +95,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         }
 
         [HttpPut()]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdatePost([FromBody] PostIn postIn)
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Posts.PostsClient(channel);
-                var reply  = await client.UpdatePostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = { GrpcMapperHelper.ToGrpcTopics(postIn.Topics)}});
+                var reply  = await _client.UpdatePostAsync( new PostRequest{ Name = postIn.Name, Content = postIn.Content, Topics = { GrpcMapperHelper.ToGrpcTopics(postIn.Topics)}});
                 
                 var response = new PostOut
                 {
@@ -121,15 +117,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         }
 
         [HttpDelete("{name}", Name = "DeletePost")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(string name)
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Posts.PostsClient(channel);
-                var reply  = await client.DeletePostAsync( new PostRequest{ Name = name});
+                var reply  = await _client.DeletePostAsync( new PostRequest{ Name = name});
                 
                 return Ok(reply);
             }

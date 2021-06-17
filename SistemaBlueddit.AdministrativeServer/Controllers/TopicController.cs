@@ -16,10 +16,14 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
         private string _serverAddress;
 
+        private Topics.TopicsClient _client;
+
         public TopicController(IConfiguration configuration) 
         {
             _configuration = configuration;
             _serverAddress = _configuration.GetSection("serverAddress").Value;
+            using var channel = GrpcChannel.ForAddress(_serverAddress);
+            _client = new Topics.TopicsClient(channel);
         }
 
         [HttpGet]
@@ -29,15 +33,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Topics.TopicsClient(channel);
-                var reply  = await client.GetTopicsAsync( new Empty{ });
+                var reply  = await _client.GetTopicsAsync( new Empty{ });
                 
                 return Ok(reply);
             }
             catch (Exception e)
             {
-                return Ok(e.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
         
@@ -48,28 +50,24 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Topics.TopicsClient(channel);
-                var reply  = await client.GetTopicsByNameAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
+                var reply  = await _client.GetTopicsByNameAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
                 
                 return Ok(reply);
             }
             catch (Exception e)
             {
-                return Ok(e.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPost()]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Post([FromBody] TopicIn topicIn)
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Topics.TopicsClient(channel);
-                var reply  = await client.AddTopicAsync( new TopicRequest{ TopicName = topicIn.Name, TopicDescription = topicIn.Description});
+                var reply  = await _client.AddTopicAsync( new TopicRequest{ TopicName = topicIn.Name, TopicDescription = topicIn.Description});
                 
                 return Ok(reply);
             }
@@ -80,15 +78,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         }
 
         [HttpPut("{name}", Name = "UpdateTopic")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(string name, [FromBody] TopicIn topicIn)
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Topics.TopicsClient(channel);
-                var reply  = await client.UpdateTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = topicIn.Description});
+                var reply  = await _client.UpdateTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = topicIn.Description});
                 
                 return Ok(reply);
             }
@@ -99,15 +95,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         }
 
         [HttpDelete("{name}", Name = "DeleteTopic")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(string name)
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(_serverAddress);
-                var client = new Topics.TopicsClient(channel);
-                var reply  = await client.DeleteTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
+                var reply  = await _client.DeleteTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
                 
                 return Ok(reply);
             }

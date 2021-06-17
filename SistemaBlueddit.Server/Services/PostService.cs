@@ -50,31 +50,41 @@ namespace SistemaBlueddit.Server.Services
 
         public override async Task<PostResponse> AddPost(PostRequest request, ServerCallContext context)
         {
-            var topics = GrpcMapperHelper.ToTopicList(request.Topics);
-            var post = new Post{
-                Name = request.Name,
-                Content = request.Content,
-                Topics = topics,
-                CreationDate = DateTime.Now
-            };
-            var message = "";
+            try{
+                var topics = GrpcMapperHelper.ToTopicList(request.Topics);
+                var post = new Post{
+                    Name = request.Name,
+                    Content = request.Content,
+                    Topics = topics,
+                    CreationDate = DateTime.Now
+                };
+                var message = "";
 
-            if (_postLogic.Validate(post) && _topicLogic.ValidateTopics(topics)){
-                _postLogic.Add(post);
-                message = $"El post {post.Name} se ha creado con exito";
-            }
-            else{
-                message = "Error. El post ya existe o los temas no son validos";
-            }
+                if (_postLogic.Validate(post) && _topicLogic.ValidateTopics(topics)){
+                    _postLogic.Add(post);
+                    message = $"El post {post.Name} se ha creado con exito";
+                }
+                else{
+                    message = "Error. El post ya existe o los temas no son validos";
+                }
 
 
-            await _messageLogic.SendMessageAsync(message, "Post");
+                await _messageLogic.SendMessageAsync(message, "Post");
 
-            return new PostResponse
+                return new PostResponse
+                {
+                    Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
+                    Message = message
+                };
+            }catch(Exception e)
             {
-                Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
-                Message = message
-            };
+                Console.WriteLine($"No se pudo agregar el post: {e.Message}");
+                return new PostResponse
+                {
+                    Posts = {},
+                    Message = $"No se pudo agregar el post: {e.Message}"
+                };
+            }
         }
 
         public override async Task<PostResponse> UpdatePost(PostRequest request, ServerCallContext context)
