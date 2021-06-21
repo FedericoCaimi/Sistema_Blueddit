@@ -121,7 +121,8 @@ namespace SistemaBlueddit.Server
 
             var topic = new Topic
             {
-                Name = name
+                Name = name,
+                Description = ""
             };
 
             var existingTopic = _topicLogic.GetByName(name);

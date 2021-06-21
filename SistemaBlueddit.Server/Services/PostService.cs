@@ -144,6 +144,8 @@ namespace SistemaBlueddit.Server.Services
             var post = new Post
             {
                 Name = request.Name,
+                Content = "",
+                Topics = new List<Topic>()
             };
 
             var existingPost = _postLogic.GetByName(name);

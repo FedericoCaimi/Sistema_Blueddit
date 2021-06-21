@@ -69,7 +69,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
                 if (reply.Topics.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 _channel.Dispose();
                 return Ok(reply);
@@ -99,7 +99,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
                 if (reply.Topics.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 _channel.Dispose();
                 return Ok(reply);
@@ -130,7 +130,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
                 if (reply.Topics.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 _channel.Dispose();
                 return Ok(reply);
@@ -157,9 +157,9 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             {
                 var reply  = await _client.DeleteTopicAsync( new TopicRequest{ TopicName = name, TopicDescription = ""});
 
-                if (reply.Topics.Count == 0)
+                if (reply.Topics == null || reply.Topics.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 _channel.Dispose();
                 return Ok(reply);

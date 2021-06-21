@@ -83,7 +83,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
                 if(response.Posts.Count == 0)
                 {
-                    return BadRequest(response.Message);
+                    return BadRequest(response);
                 }
                 _channel.Dispose();
                 return Ok(response);
@@ -113,7 +113,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
                 if(reply.Posts.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 
                 var response = new PostOut
@@ -149,7 +149,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
                 if(reply.Posts.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 
                 var response = new PostOut
@@ -183,9 +183,9 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
             {
                 var reply  = await _client.DeletePostAsync( new PostRequest{ Name = name});
 
-                if (reply.Posts.Count == 0)
+                if (reply.Posts == null || reply.Posts.Count == 0)
                 {
-                    return BadRequest(reply.Message);
+                    return BadRequest(reply);
                 }
                 _channel.Dispose();
                 return Ok(reply);
