@@ -10,6 +10,10 @@ using SistemaBlueddit.LogServer.Logic;
 using SistemaBlueddit.LogServer.Logic.Interfaces;
 using System.Text;
 using System.Text.Json;
+using Swashbuckle.AspNetCore.Swagger;
+using System.Reflection;
+using System.IO;
+using System;
 
 namespace SistemaBlueddit.LogServer
 {
@@ -30,6 +34,14 @@ namespace SistemaBlueddit.LogServer
             services.AddSingleton(Configuration);
 
             services.AddSingleton<ILogLogic, LogLogic>();
+
+            services.AddSwaggerGen(c => 
+            {
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
 
             services.AddCors(options =>
             {
@@ -62,6 +74,13 @@ namespace SistemaBlueddit.LogServer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = "";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Log Server");
             });
         }
 

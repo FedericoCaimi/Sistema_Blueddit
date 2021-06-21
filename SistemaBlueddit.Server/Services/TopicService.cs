@@ -39,9 +39,13 @@ namespace SistemaBlueddit.Server
             var topic = _topicLogic.GetByName(name);
             var message = topic == null ? $"El tema {name} no existe" : "";
 
+            var topicsToReturn = topic != null 
+                ? GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic }) 
+                : GrpcMapperHelper.ToGrpcTopics(new List<Topic>());
+
             return Task.FromResult(new TopicResponse
             {
-                Topics = { GrpcMapperHelper.ToGrpcTopics(new List<Topic>{ topic }) },
+                Topics = { topicsToReturn },
                 Message = message
             });
         }
@@ -56,14 +60,27 @@ namespace SistemaBlueddit.Server
                 Description = description
             };
 
-            _topicLogic.Add(topic);
             var message = "El tema se creo con exito";
+
+            if (_topicLogic.Validate(topic))
+            {
+                _topicLogic.Add(topic);
+            }
+            else
+            {
+                message = "El tema ya existe";
+                topic = null;
+            }
 
             await _messageLogic.SendMessageAsync(message, "Topic");
 
+            var topicsToReturn = topic != null
+                ? GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic })
+                : GrpcMapperHelper.ToGrpcTopics(new List<Topic>());
+
             return new TopicResponse
             {
-                Topics = { GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic }) },
+                Topics = { topicsToReturn },
                 Message = message
             };
         }
@@ -79,11 +96,20 @@ namespace SistemaBlueddit.Server
             };
             var message = _topicLogic.ModifyTopic(topic);
 
+            if(message.Contains("no existe"))
+            {
+                topic = null;
+            }
+
             await _messageLogic.SendMessageAsync(message, "Topic");
+
+            var topicsToReturn = topic != null
+                ? GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic })
+                : GrpcMapperHelper.ToGrpcTopics(new List<Topic>());
 
             return new TopicResponse
             {
-                Topics = { GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic }) },
+                Topics = { topicsToReturn },
                 Message = message
             };
         }
@@ -93,12 +119,18 @@ namespace SistemaBlueddit.Server
             var name = request.TopicName;
             var message = "";
 
+            var topic = new Topic
+            {
+                Name = name
+            };
+
             var existingTopic = _topicLogic.GetByName(name);
             if (existingTopic != null)
             {
                 if (_postLogic.IsTopicInPost(existingTopic))
                 {
                     message = "Error. No se puede borrar el tema porque esta asociado a un post.";
+                    topic = null;
                 }
                 else
                 {
@@ -108,11 +140,18 @@ namespace SistemaBlueddit.Server
             }
             else
             {
-                 message = "No existe el tema con el nombre ingresado.";
+                message = "No existe el tema con el nombre ingresado.";
+                topic = null;
             }
             await _messageLogic.SendMessageAsync(message, "Topic");
+
+            var topicsToReturn = topic != null
+                ? GrpcMapperHelper.ToGrpcTopics(new List<Topic> { topic })
+                : GrpcMapperHelper.ToGrpcTopics(new List<Topic>());
+
             return new TopicResponse
             {
+                Topics = { topicsToReturn },
                 Message = message
             };
         }

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -13,4 +14,10 @@
     <ProjectReference Include="..\SistemaBlueddit.LogServer.Logic.Interfaces\SistemaBlueddit.LogServer.Logic.Interfaces.csproj" />
     <ProjectReference Include="..\SistemaBlueddit.LogServer.Logic\SistemaBlueddit.LogServer.Logic.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  
 </Project>

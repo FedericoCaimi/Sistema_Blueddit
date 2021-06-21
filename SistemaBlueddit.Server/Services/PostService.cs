@@ -41,9 +41,13 @@ namespace SistemaBlueddit.Server.Services
             var post = _postLogic.GetByName(name);
             var message = post == null ? $"El post {name} no existe" : "";
 
+            var postsToReturn = post != null
+                ? GrpcMapperHelper.ToGrpcPosts(new List<Post> { post })
+                : GrpcMapperHelper.ToGrpcPosts(new List<Post>());
+
             return Task.FromResult(new PostResponse
             {
-                Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
+                Posts = { postsToReturn },
                 Message = message
             });
         }
@@ -66,14 +70,19 @@ namespace SistemaBlueddit.Server.Services
                 }
                 else{
                     message = "Error. El post ya existe o los temas no son validos";
+                    post = null;
                 }
 
 
                 await _messageLogic.SendMessageAsync(message, "Post");
 
+                var postsToReturn = post != null
+                    ? GrpcMapperHelper.ToGrpcPosts(new List<Post> { post })
+                    : GrpcMapperHelper.ToGrpcPosts(new List<Post>());
+
                 return new PostResponse
                 {
-                    Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
+                    Posts = { postsToReturn },
                     Message = message
                 };
             }catch(Exception e)
@@ -105,18 +114,24 @@ namespace SistemaBlueddit.Server.Services
                 }
                 else{
                     message = "los temas no son validos." ;
+                    post = null;
                 }
             }
             else{
                 message = "No existe el post con el nombre ingresado." ;
+                post = null;
             }
 
 
             await _messageLogic.SendMessageAsync(message, "Post");
 
+            var postsToReturn = post != null
+                ? GrpcMapperHelper.ToGrpcPosts(new List<Post> { post })
+                : GrpcMapperHelper.ToGrpcPosts(new List<Post>());
+
             return new PostResponse
             {
-                Posts = { GrpcMapperHelper.ToGrpcPosts(new List<Post> { post }) },
+                Posts = { postsToReturn },
                 Message = message
             };
         }
@@ -126,6 +141,11 @@ namespace SistemaBlueddit.Server.Services
             var name = request.Name;
             var message = "";
 
+            var post = new Post
+            {
+                Name = request.Name,
+            };
+
             var existingPost = _postLogic.GetByName(name);
             if (existingPost != null)
             {
@@ -134,11 +154,18 @@ namespace SistemaBlueddit.Server.Services
             }
             else
             {
-                 message = $"No existe el post con el nombre {name}.";
+                message = $"No existe el post con el nombre {name}.";
+                post = null; 
             }
             await _messageLogic.SendMessageAsync(message, "Post");
+
+            var postsToReturn = post != null
+                ? GrpcMapperHelper.ToGrpcPosts(new List<Post> { post })
+                : GrpcMapperHelper.ToGrpcPosts(new List<Post>());
+
             return new PostResponse
             {
+                Posts = { postsToReturn },
                 Message = message
             };
         }
