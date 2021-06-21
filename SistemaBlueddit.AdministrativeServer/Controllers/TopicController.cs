@@ -18,12 +18,14 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
 
         private Topics.TopicsClient _client;
 
+        private GrpcChannel _channel;
+
         public TopicController(IConfiguration configuration) 
         {
             _configuration = configuration;
             _serverAddress = _configuration.GetSection("serverAddress").Value;
-            var channel = GrpcChannel.ForAddress(_serverAddress);
-            _client = new Topics.TopicsClient(channel);
+            _channel = GrpcChannel.ForAddress(_serverAddress);
+            _client = new Topics.TopicsClient(_channel);
         }
 
         /// <summary>
@@ -33,14 +35,13 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         /// <response code="500">Error interno del servidor.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTopics()
         {
             try
             {
                 var reply  = await _client.GetTopicsAsync( new Empty{ });
-                
+                _channel.Dispose();
                 return Ok(reply);
             }
             catch (Exception e)
@@ -70,7 +71,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 {
                     return BadRequest(reply.Message);
                 }
-
+                _channel.Dispose();
                 return Ok(reply);
             }
             catch (Exception e)
@@ -100,7 +101,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 {
                     return BadRequest(reply.Message);
                 }
-
+                _channel.Dispose();
                 return Ok(reply);
             }
             catch (Exception)
@@ -131,7 +132,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 {
                     return BadRequest(reply.Message);
                 }
-
+                _channel.Dispose();
                 return Ok(reply);
             }
             catch (Exception)
@@ -160,7 +161,7 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
                 {
                     return BadRequest(reply.Message);
                 }
-
+                _channel.Dispose();
                 return Ok(reply);
             }
             catch (Exception)

@@ -36,11 +36,9 @@ namespace SistemaBlueddit.AdministrativeServer.Controllers
         /// Permite a un usuario obtener todas las publicaciones del sistema
         /// </summary>
         /// <response code="200">Se devuelve la información requerida.</response>
-        /// <response code="400">Error de solicitud del cliente</response>
         /// <response code="500">Error interno del servidor.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPosts()
         {
