@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "57ce7465-4496-4e8b-b493-ebf05231d746",
+		"_postman_id": "2ba7ad15-af23-4fb0-bb50-74269e16304c",
 		"name": "Redes",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -29,12 +29,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:5000/topic",
-									"protocol": "http",
+									"raw": "{{AdminServer}}/topic",
 									"host": [
-										"localhost"
+										"{{AdminServer}}"
 									],
-									"port": "5000",
 									"path": [
 										"topic"
 									]
@@ -48,12 +46,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:5000/topic/tema1",
-									"protocol": "http",
+									"raw": "{{AdminServer}}/topic/tema1",
 									"host": [
-										"localhost"
+										"{{AdminServer}}"
 									],
-									"port": "5000",
 									"path": [
 										"topic",
 										"tema1"
@@ -77,12 +73,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:5000/topic",
-									"protocol": "http",
+									"raw": "{{AdminServer}}/topic",
 									"host": [
-										"localhost"
+										"{{AdminServer}}"
 									],
-									"port": "5000",
 									"path": [
 										"topic"
 									]
@@ -105,12 +99,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:5000/topic/tema1",
-									"protocol": "http",
+									"raw": "{{AdminServer}}/topic/tema1",
 									"host": [
-										"localhost"
+										"{{AdminServer}}"
 									],
-									"port": "5000",
 									"path": [
 										"topic",
 										"tema1"
@@ -125,15 +117,13 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:5000/topic/tema1",
-									"protocol": "http",
+									"raw": "{{AdminServer}}/topic/tema5",
 									"host": [
-										"localhost"
+										"{{AdminServer}}"
 									],
-									"port": "5000",
 									"path": [
 										"topic",
-										"tema1"
+										"tema5"
 									]
 								}
 							},
@@ -186,7 +176,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Name\": \"Post1\",\r\n    \"Content\": \"algo\",\r\n    \"Topics\": [{\r\n        \"Name\":\"topic1\",\r\n        \"Description\":\"asdf\"\r\n    }]\r\n}\r\n",
+									"raw": "{\r\n    \"Name\": \"Post5\",\r\n    \"Content\": \"algo\",\r\n    \"Topics\": [{\r\n        \"Name\":\"tema1\",\r\n        \"Description\":\"\"\r\n    }]\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -211,13 +201,13 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{AdminServer}}/post/post1",
+									"raw": "{{AdminServer}}/post/Post5",
 									"host": [
 										"{{AdminServer}}"
 									],
 									"path": [
 										"post",
-										"post1"
+										"Post5"
 									]
 								}
 							},
@@ -230,7 +220,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Name\": \"post1\",\r\n    \"Content\": \"update post\",\r\n    \"Topics\": [{\r\n        \"Name\":\"topic1\",\r\n        \"Description\":\"asdf\"\r\n    }]\r\n}",
+									"raw": "{\r\n    \"Name\": \"post1\",\r\n    \"Content\": \"update post\",\r\n    \"Topics\": [{\r\n        \"Name\":\"tema2\",\r\n        \"Description\":\"\"\r\n    }]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -269,6 +259,79 @@
 							],
 							"path": [
 								"log"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetLogsByType",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LogServer}}/log?type=Post",
+							"host": [
+								"{{LogServer}}"
+							],
+							"path": [
+								"log"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "Post"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetLogsByDate",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LogServer}}/log?date=20210621",
+							"host": [
+								"{{LogServer}}"
+							],
+							"path": [
+								"log"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "20210621"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetLogsByTypeAndDate",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LogServer}}/log?type=Topic&date=20210621",
+							"host": [
+								"{{LogServer}}"
+							],
+							"path": [
+								"log"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "Topic"
+								},
+								{
+									"key": "date",
+									"value": "20210621"
+								}
 							]
 						}
 					},
